@@ -6,7 +6,7 @@ public class QueueRuntimeTest {
 
 	public static void main(String ...strings ) {
 	
-		QueueRuntime runtime = new QueueRuntime(QueueConfig.withDefaults());
+		QQServer runtime = new QQServer(QueueConfig.withDefaults());
 		
 		new Thread(new Runnable() {
 			@Override

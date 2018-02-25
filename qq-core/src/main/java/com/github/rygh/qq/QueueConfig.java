@@ -3,9 +3,13 @@ package com.github.rygh.qq;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import com.github.rygh.qq.domain.Work;
+import com.github.rygh.qq.example.SecondService;
 
 public class QueueConfig {
 
@@ -15,6 +19,12 @@ public class QueueConfig {
 
 	public static QueueConfig withDefaults() {
 		return new QueueConfig();
+	}
+
+	public Supplier<Map<Class<?>, Object>> getQueueSource() {
+		return () -> {
+			return Collections.EMPTY_MAP;
+		};
 	}
 	
 	public WorkRepository getWorkRepository() {
@@ -37,7 +47,10 @@ public class QueueConfig {
 			
 			@Override
 			public List<Work> findWork() {
-				return Arrays.asList(new Work(), new Work());
+				return Arrays.asList(
+						Work.processEntity(1L, Object.class).withService(SecondService.class), 
+						Work.processEntity(2L, Object.class).withService(SecondService.class)
+						);
 			}
 		};
 	}

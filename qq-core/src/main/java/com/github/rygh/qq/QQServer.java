@@ -21,6 +21,8 @@ import com.github.rygh.qq.util.NumberedNameThreadFactory;
 	- Interface: EntityPersister
 
 
+* Config -> start(config) => CreateContext (queues, count, naming, consumers)
+
 	Poll-items
 		For item
 			Find Queue
@@ -48,14 +50,14 @@ import com.github.rygh.qq.util.NumberedNameThreadFactory;
 
  *
  */
-public class QueueRuntime {
+public class QQServer {
 
 	private ScheduledExecutorService poller;
 	private ThreadPoolExecutor worker;
 	
 	private QueueConfig config;
 	
-	public QueueRuntime(QueueConfig config) {
+	public QQServer(QueueConfig config) {
 		this.config = config;
 		
 		this.poller = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("qq-poller"));
