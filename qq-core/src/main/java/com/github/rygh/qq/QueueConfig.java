@@ -2,17 +2,26 @@ package com.github.rygh.qq;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
+
 import com.github.rygh.qq.domain.Work;
-import com.github.rygh.qq.example.SecondService;
 
 public class QueueConfig {
 
+	private WorkRepository workRepository;
+	private PlatformTransactionManager platformTransactionManager;
+	
+	private String instanceId = UUID.randomUUID().toString();
+	private TimeZone displayTimeZone = TimeZone.getDefault();
 	
 	private QueueConfig() {
 	}
@@ -21,38 +30,33 @@ public class QueueConfig {
 		return new QueueConfig();
 	}
 
-	public Supplier<Map<Class<?>, Object>> getQueueSource() {
+	// Nope! Config should begat context
+	public Supplier<Map<String, Consumer<Work>>> getQueueSource() {
 		return () -> {
 			return Collections.EMPTY_MAP;
 		};
 	}
 	
+	public PlatformTransactionManager getTransactionManager() {
+		return platformTransactionManager;
+	}
+	
+	public void setPlatformTransactionManager(PlatformTransactionManager platformTransactionManager) {
+		this.platformTransactionManager = platformTransactionManager;
+	}
+	
+	public void setWorkRepository(WorkRepository workRepository) {
+		this.workRepository = workRepository;
+	}
+	
+	public TransactionTemplate createTransactionTemplate() {
+		TransactionTemplate transactionTemplate = new TransactionTemplate(getTransactionManager());
+		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		return transactionTemplate;
+	}
+	
 	public WorkRepository getWorkRepository() {
-		return new WorkRepository() {
-			
-			@Override
-			public Work update(Work work) {
-				return null;
-			}
-			
-			@Override
-			public Work store(Work work) {
-				return null;
-			}
-			
-			@Override
-			public Work getWork(Long id) {
-				return null;
-			}
-			
-			@Override
-			public List<Work> findWork() {
-				return Arrays.asList(
-						Work.processEntity(1L, Object.class).withService(SecondService.class), 
-						Work.processEntity(2L, Object.class).withService(SecondService.class)
-						);
-			}
-		};
+		return workRepository; // TODO: Default inmemory repository
 	}
 	
 	public int getCorePoolSize() {
@@ -66,7 +70,6 @@ public class QueueConfig {
 	public Duration getPollingFrequency() {
 		return Duration.of(1L, ChronoUnit.SECONDS);
 	}
-
 
 	@Override
 	public String toString() {
