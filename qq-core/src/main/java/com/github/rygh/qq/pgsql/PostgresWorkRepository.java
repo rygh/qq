@@ -105,7 +105,8 @@ public class PostgresWorkRepository implements WorkRepository {
 			return new Work(rs.getLong("id"), nullsafe(rs.getTimestamp("created_time")), rs.getString("entity_class"), rs.getString("entity_id"), rs.getString("consumer"))
 				.setCompletedTime(nullsafe(rs.getTimestamp("completed_time")))
 				.setStartedTime(nullsafe(rs.getTimestamp("started_time")))
-				.setState(WorkState.valueOf(rs.getString("state")));
+				.setState(WorkState.valueOf(rs.getString("state")))
+				.setVersion(rs.getInt("version"));
 		}
 		
 		private LocalDateTime nullsafe(Timestamp ts) {
@@ -137,8 +138,14 @@ public class PostgresWorkRepository implements WorkRepository {
 	 * Entity will remain locked for the period of the external transaction this method in called in
 	 */
 	@Override
-	public Optional<Work> getWorkWithLock(Long id) {
+	public Optional<Work> getByIdWithLock(Long id) {
 		String sql = "select * from work where id = :id for update skip locked";
+		return database.query(sql, new MapSqlParameterSource("id", id), new WorkRowMapper()).stream().findFirst();
+	}
+	
+	@Override
+	public Optional<Work> getById(Long id) {
+		String sql = "select * from work where id = :id";
 		return database.query(sql, new MapSqlParameterSource("id", id), new WorkRowMapper()).stream().findFirst();
 	}
 
@@ -150,20 +157,23 @@ public class PostgresWorkRepository implements WorkRepository {
 				+ " consumer, "
 				+ " entity_class, "
 				+ " entity_id, "
-				+ " state "
+				+ " state, "
+				+ " version "
 				+ ") values ("
 				+ " :created, "
 				+ " :consumer, "
 				+ " :entityClass, "
 				+ " :entityId, "
-				+ " :state "
+				+ " :state, "
+				+ " :version "
 				+ ") returning id";
 		
 		SqlParameterSource params = new MapSqlParameterSource("created", work.getCreatedTime())
 			.addValue("consumer", work.getConsumer())
 			.addValue("entityClass", work.getEntityType())
 			.addValue("entityId", work.getEntityId())
-			.addValue("state", work.getState().name());
+			.addValue("state", work.getState().name())
+			.addValue("version",  work.getVersion());
 		
 		Long assignedSerialId = database.queryForObject(sql, params, Long.class);
 		return work.setId(requireNonNull(assignedSerialId, "Assigned id was null when storing " + work + ", it's a horrible situation!"));

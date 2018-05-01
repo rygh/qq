@@ -90,6 +90,10 @@ public class Work {
 		return version + 1;
 	}
 
+	public boolean is(WorkState requestedState) {
+		return this.state == requestedState;
+	}
+	
 	@Override
 	public String toString() {
 		return "Work [id=" + id 
@@ -97,6 +101,7 @@ public class Work {
 				+ ", entityId=" + entityId 
 				+ ", consumer=" + consumer
 				+ ", state=" + state 
+				+ ", version=" + version
 				+ "]";
 	}
 }

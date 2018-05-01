@@ -38,7 +38,17 @@ public class WorkPoller implements Runnable {
 			
 			workRepository.claimNextReady(approxFreeThreads)
 				.map(workerFactory::createTransactionalWorkerFor)
-				.forEach(pool::execute);
+				.forEach(pool::execute); // TODO: Wrapper around pool?
 		}
 	}
 }
+
+
+// TEST: Work is retrieved
+// TEST: Executing work, correct states
+// TEST: Error handling - need to set error
+// TEST: Oppførsel: Arbeid hentes ned og konsumeres, tilstand endres
+// TEST: Sette opp H2
+// TEST: Rest service for å poste work
+
+

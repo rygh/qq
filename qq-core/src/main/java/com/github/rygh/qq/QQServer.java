@@ -30,24 +30,26 @@ public class QQServer {
 		this.pool = new ThreadPoolExecutor(config.getCorePoolSize(), config.getMaxPoolSize(), 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NumberedNameThreadFactory("qq-worker") );
 	}
 	
-	public void start() {
+	public QQServer start() {
 		logger.info("Starting work poller, good luck!\n{}", config);
 		
 		Duration freq = config.getPollingFrequency();
 		poller.scheduleAtFixedRate(new WorkPoller(config, pool), 0, freq.toMillis(), TimeUnit.MILLISECONDS);
+		
+		return this;
 	}
 	
 	public void stop() {
 		try {
 			logger.info("Stopping work poller...");
-			poller.shutdown();
+			poller.shutdownNow();
 		} catch (Exception e) {
 			logger.warn("Error stopping work poller, but we are shutting down anyhow. {}", e.getMessage());
 		}
 		
 		try {
 			logger.info("Stopping worker thread pool...");
-			pool.shutdown();
+			pool.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			logger.warn("Error stopping worker thread pool, but we are shutting down anyhow. {}", e.getMessage());
 		}

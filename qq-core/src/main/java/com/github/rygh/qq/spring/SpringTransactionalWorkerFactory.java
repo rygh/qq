@@ -56,7 +56,7 @@ public class SpringTransactionalWorkerFactory {
 						
 						// Attempt to lock work-item -> If not available some other consumer got it, exit!
 						// Item remains locked for the duration of the job, this state is currently invisible to the outside!
-						Optional<Work> lockedItem = workRepository.getWorkWithLock(work.getId());
+						Optional<Work> lockedItem = workRepository.getByIdWithLock(work.getId());
 						if (!lockedItem.isPresent()) {
 							logger.debug("Failed to aquire lock for {}, moving along", work);
 							return;
