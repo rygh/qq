@@ -32,10 +32,9 @@ public class QQServer {
 	
 	public QQServer start() {
 		logger.info("Starting work poller, good luck!\n{}", config);
-		
+
 		Duration freq = config.getPollingFrequency();
 		poller.scheduleAtFixedRate(new WorkPoller(config, pool), 0, freq.toMillis(), TimeUnit.MILLISECONDS);
-		
 		return this;
 	}
 	

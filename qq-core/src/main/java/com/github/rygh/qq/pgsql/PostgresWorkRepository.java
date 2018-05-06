@@ -97,6 +97,7 @@ while (capacity > 0 && worklist != empty)
  * @author jrygh
  *
  */
+
 public class PostgresWorkRepository implements WorkRepository {
 
 	private final class WorkRowMapper implements RowMapper<Work> {

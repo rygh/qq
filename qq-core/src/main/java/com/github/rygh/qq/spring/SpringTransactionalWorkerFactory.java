@@ -91,7 +91,7 @@ public class SpringTransactionalWorkerFactory {
 		}
 	}
 
-	public Runnable createTransactionalWorkerFor(Work work) {
+    public Runnable createTransactionalWorkerFor(Work work) {
 		return new TransactionalWorker(work);
 	}
 	

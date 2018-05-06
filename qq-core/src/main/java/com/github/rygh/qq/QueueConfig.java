@@ -31,7 +31,7 @@ public class QueueConfig {
 	}
 
 	// Nope! Config should begat context
-	public Supplier<Map<String, Consumer<Work>>> getQueueSource() {
+    public Supplier<Map<String, Consumer<Work>>> getQueueSource() {
 		return () -> {
 			return Collections.EMPTY_MAP;
 		};
@@ -49,7 +49,7 @@ public class QueueConfig {
 		this.workRepository = workRepository;
 	}
 	
-	public TransactionTemplate createTransactionTemplate() {
+    public TransactionTemplate createTransactionTemplate() {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(getTransactionManager());
 		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		return transactionTemplate;
@@ -71,7 +71,7 @@ public class QueueConfig {
 		return Duration.of(1L, ChronoUnit.SECONDS);
 	}
 
-	@Override
+    @Override
 	public String toString() {
 		return "Current QueueConfig\n"
 				+ "* WorkRepository......" + getWorkRepository().getClass() + "\n"

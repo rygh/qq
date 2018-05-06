@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -23,6 +24,7 @@ import com.github.rygh.qq.pgsql.PostgresWorkRepository;
 
 public class PostgresContainerSmokeTest {
 	
+    @NotNull
     @ClassRule
     public static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:latest");
     
@@ -62,7 +64,7 @@ public class PostgresContainerSmokeTest {
 		config.setWorkRepository(workRepository);
 		
 		QQServer runtime = new QQServer(config).start();
-		
+
 		while (workRepository.findFirst(10).count() > 0) {
 			try {
 				TimeUnit.MILLISECONDS.sleep(200);
