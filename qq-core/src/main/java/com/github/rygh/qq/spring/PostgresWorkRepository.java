@@ -1,4 +1,4 @@
-package com.github.rygh.qq.pgsql;
+package com.github.rygh.qq.spring;
 
 import static java.util.Objects.requireNonNull;
 
@@ -208,7 +208,7 @@ public class PostgresWorkRepository implements WorkRepository {
 		
 		return work.setVersion(nextVersion);
 	}
-
+ 
 	/**
 	 * This method has its own transaction and does three actions
 	 * - Items are locked up to the max count, skip locked is used so 

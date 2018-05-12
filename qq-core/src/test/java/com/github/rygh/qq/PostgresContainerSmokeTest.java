@@ -14,13 +14,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
-import com.github.rygh.qq.pgsql.PostgresWorkRepository;
+import com.github.rygh.qq.spring.SpringConfigurationFactory;
 
 public class PostgresContainerSmokeTest {
 	
@@ -52,16 +51,17 @@ public class PostgresContainerSmokeTest {
     @Test(timeout = 15_000)
     public void publishWorkAndStartConsumer() throws SQLException {
     	
-    	DataSource ds = getOrCreateDataSource();
-		
-		QueueConfig config = QueueConfig.withDefaults();
-		config.setPlatformTransactionManager(new DataSourceTransactionManager(ds));
-		final WorkRepository workRepository = new PostgresWorkRepository(ds, config.createTransactionTemplate());
-		
+    	ConsumerRegister register = new ConsumerRegister();
+    	register.register("TestQueue", System.out::println);
+    	
+    	QueueConfig config = SpringConfigurationFactory.withSpringDefaults(getOrCreateDataSource());
+    	config.setConsumerRegister(register);
+    	
+    	WorkRepository workRepository = config.getWorkRepository();
+    	
 		WorkPublisher publisher = new WorkPublisher(workRepository);
 		Work w1 = publisher.publish(Object.class, UUID.randomUUID().toString(), "TestQueue");
 		Work w2 = publisher.publish(Object.class, UUID.randomUUID().toString(), "TestQueue");
-		config.setWorkRepository(workRepository);
 		
 		QQServer runtime = new QQServer(config).start();
 

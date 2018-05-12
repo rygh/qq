@@ -5,20 +5,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.rygh.qq.spring.SpringTransactionalWorkerFactory;
-
 public class WorkPoller implements Runnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WorkPoller.class);
 	
 	private final WorkRepository workRepository;
 	private final ThreadPoolExecutor pool;
-	private final SpringTransactionalWorkerFactory workerFactory;
+	private final TransactionalWorkerFactory workerFactory;
+	private final QueueContext context;
 	
-	public WorkPoller(QueueConfig config, ThreadPoolExecutor pool) {
-		this.workRepository = config.getWorkRepository();
+	public WorkPoller(QueueContext context, ThreadPoolExecutor pool) {
+		this.context = context;
+		this.workRepository = context.getWorkRepository();
 		this.pool = pool;
-		this.workerFactory = new SpringTransactionalWorkerFactory(config);
+		this.workerFactory = context.getTransactionalWorkerFactory();
 	}
 
 	private boolean poolIsShuttingDown() {
@@ -37,6 +37,7 @@ public class WorkPoller implements Runnable {
 			logger.debug("Queue is empty and pool got {} free threads, search for new work", approxFreeThreads);
 			
 			workRepository.claimNextReady(approxFreeThreads)
+				.map(work -> new UnitOfWork(context, work))
 				.map(workerFactory::createTransactionalWorkerFor)
 				.forEach(pool::execute); // TODO: Wrapper around pool?
 		}

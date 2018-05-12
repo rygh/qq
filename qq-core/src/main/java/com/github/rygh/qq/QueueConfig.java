@@ -1,27 +1,23 @@
 package com.github.rygh.qq;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import com.github.rygh.qq.domain.Work;
 
 public class QueueConfig {
 
 	private WorkRepository workRepository;
-	private PlatformTransactionManager platformTransactionManager;
 	
 	private String instanceId = UUID.randomUUID().toString();
 	private TimeZone displayTimeZone = TimeZone.getDefault();
+	private Optional<Integer> poolSize = Optional.empty();
+	private Supplier<ConsumerRegister> consumerSupplier = () -> new ConsumerRegister();
+	private TransactionalWorkerFactory transactionalWorkerFactory;
 	
 	private QueueConfig() {
 	}
@@ -30,37 +26,29 @@ public class QueueConfig {
 		return new QueueConfig();
 	}
 
-	// Nope! Config should begat context
-    public Supplier<Map<String, Consumer<Work>>> getQueueSource() {
-		return () -> {
-			return Collections.EMPTY_MAP;
-		};
+    public void setConsumerRegister(ConsumerRegister register) {
+    	this.consumerSupplier = () -> register;
+    }
+    
+    public void setConsumerRegisterSupplier(Supplier<ConsumerRegister> consumerSupplier) {
+		this.consumerSupplier = consumerSupplier;
 	}
-	
-	public PlatformTransactionManager getTransactionManager() {
-		return platformTransactionManager;
-	}
-	
-	public void setPlatformTransactionManager(PlatformTransactionManager platformTransactionManager) {
-		this.platformTransactionManager = platformTransactionManager;
-	}
-	
+    
 	public void setWorkRepository(WorkRepository workRepository) {
 		this.workRepository = workRepository;
-	}
-	
-    public TransactionTemplate createTransactionTemplate() {
-		TransactionTemplate transactionTemplate = new TransactionTemplate(getTransactionManager());
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		return transactionTemplate;
 	}
 	
 	public WorkRepository getWorkRepository() {
 		return workRepository; // TODO: Default inmemory repository
 	}
 	
+	public QueueConfig setCorePoolSize(int size) {
+		poolSize = Optional.of(size);
+		return this;
+	}
+	
 	public int getCorePoolSize() {
-		return Runtime.getRuntime().availableProcessors();
+		return poolSize.orElseGet(() -> Runtime.getRuntime().availableProcessors());
 	}
 	
 	public int getMaxPoolSize() {
@@ -70,7 +58,37 @@ public class QueueConfig {
 	public Duration getPollingFrequency() {
 		return Duration.of(1L, ChronoUnit.SECONDS);
 	}
+	
+	public void setTransactionalWorkerFactory(TransactionalWorkerFactory transactionalWorkerFactory) {
+		this.transactionalWorkerFactory = transactionalWorkerFactory;
+	}
 
+	/**
+	 * Initialize required components from config and return immutable context
+	 */
+	public QueueContext buildQueueContext() {
+		final ConsumerRegister register = requireNonNull(consumerSupplier.get(), "Consumer register or supplier must be set in config");
+		final WorkRepository repository = requireNonNull(workRepository, "Work Repoistory must be set in the config");
+		final TransactionalWorkerFactory workerFactory = requireNonNull(transactionalWorkerFactory, "Transactional WorkerFactory must be set in config");
+		
+		return new QueueContext() {
+			@Override
+			public ConsumerRegister getConsumerRegister() {
+				return register;
+			}
+			
+			@Override
+			public WorkRepository getWorkRepository() {
+				return repository;
+			}
+			
+			@Override
+			public TransactionalWorkerFactory getTransactionalWorkerFactory() {
+				return workerFactory;
+			}
+		};
+	}
+	
     @Override
 	public String toString() {
 		return "Current QueueConfig\n"
@@ -78,6 +96,5 @@ public class QueueConfig {
 				+ "* MaxPoolSize........." + getMaxPoolSize() + "\n"
 				+ "* CorePoolSize........" + getCorePoolSize() + "\n"
 				+ "* PollingFrequency...." + getPollingFrequency() + "\n";
-		
 	}
 }
