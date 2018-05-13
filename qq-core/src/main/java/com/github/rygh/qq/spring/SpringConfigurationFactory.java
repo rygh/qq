@@ -14,12 +14,8 @@ public class SpringConfigurationFactory {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(ds));
 		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		
-		QueueConfig config = QueueConfig.withDefaults();
-		config.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(transactionTemplate));
-		
-		// TODO: Remove transaction management from repository
-		config.setWorkRepository(new PostgresWorkRepository(ds, transactionTemplate));
-		
-		return config;
+		return QueueConfig.withDefaults()
+			.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(transactionTemplate))
+			.setWorkRepository(new PostgresWorkRepository(ds, transactionTemplate));
 	}
 }

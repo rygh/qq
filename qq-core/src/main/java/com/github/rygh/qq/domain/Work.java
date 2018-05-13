@@ -38,6 +38,14 @@ public class Work {
 		return entityType;
 	}
 	
+	public Class<?> getEntityClass() {
+		try {
+			return Class.forName(entityType);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public String getEntityId() {
 		return entityId;
 	}
@@ -103,5 +111,9 @@ public class Work {
 				+ ", state=" + state 
 				+ ", version=" + version
 				+ "]";
+	}
+
+	public EntityId asEntityId() {
+		return new EntityId(entityId, entityType);
 	}
 }

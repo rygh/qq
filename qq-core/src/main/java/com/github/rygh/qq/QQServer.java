@@ -30,14 +30,14 @@ public class QQServer {
 		this.pool = new ThreadPoolExecutor(config.getCorePoolSize(), config.getMaxPoolSize(), 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NumberedNameThreadFactory("qq-worker") );
 	}
 	
-	public QQServer start() {
+	public QueueContext start() {
 		logger.info("Starting work poller, good luck!\n{}", config);
 
 		QueueContext context = config.buildQueueContext();
 		
 		Duration freq = config.getPollingFrequency();
 		poller.scheduleAtFixedRate(new WorkPoller(context, pool), 0, freq.toMillis(), TimeUnit.MILLISECONDS);
-		return this;
+		return context;
 	}
 	
 	public void stop() {

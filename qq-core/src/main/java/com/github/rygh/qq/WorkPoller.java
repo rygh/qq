@@ -44,12 +44,3 @@ public class WorkPoller implements Runnable {
 	}
 }
 
-
-// TEST: Work is retrieved
-// TEST: Executing work, correct states
-// TEST: Error handling - need to set error
-// TEST: Oppførsel: Arbeid hentes ned og konsumeres, tilstand endres
-// TEST: Sette opp H2
-// TEST: Rest service for å poste work
-
-
