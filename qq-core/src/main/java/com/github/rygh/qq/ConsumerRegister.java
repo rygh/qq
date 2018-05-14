@@ -9,24 +9,16 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
 
 public class ConsumerRegister {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerRegister.class);
 	
-	private final Map<String, Consumer<Work>> consumers = new HashMap<>();
-	private final Consumer<Work> fallbackConsumer;
+	private final Map<String, Consumer<EntityId>> consumers = new HashMap<>();
 	
-	public ConsumerRegister() {
-		this(ConsumerRegister::failForUnknownConsumer);
-	}
-	
-	public ConsumerRegister(Consumer<Work> fallbackConsumer) {
-		this.fallbackConsumer = fallbackConsumer;
-	}
-	
-	public ConsumerRegister register(String name, Consumer<Work> implementation) {
+	public ConsumerRegister register(String name, Consumer<EntityId> implementation) {
 		if (consumers.containsKey(name)) {
 			throw new IllegalArgumentException(name + " already bound to consumer, " + implementation.getClass());
 		}
@@ -36,16 +28,18 @@ public class ConsumerRegister {
 		return this;
 	}
 	
-	public Consumer<Work> getConsumerFor(Work work) {
-		return consumers.getOrDefault(work.getConsumer(), fallbackConsumer);
+	public Consumer<EntityId> getConsumerFor(Work work) {
+		return consumers.getOrDefault(work.getConsumer(), consumerNotFound(work));
+	}
+	
+	private Consumer<EntityId> consumerNotFound(Work work) {
+		return (entity) -> {
+			throw new IllegalStateException("No consumer registered for " + work.getConsumer() + ", unable to process " + work);
+		};
 	}
 	
 	public Set<String> getRegisteredConsumers() {
 		return Collections.unmodifiableSet(consumers.keySet());
-	}
-	
-	private static void failForUnknownConsumer(Work work) {
-		throw new IllegalArgumentException("No consumer registered for " + work);
 	}
 	
 	@Override

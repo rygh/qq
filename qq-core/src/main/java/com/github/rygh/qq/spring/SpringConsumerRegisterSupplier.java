@@ -9,16 +9,19 @@ import java.util.stream.Stream;
 import org.springframework.context.ApplicationContext;
 
 import com.github.rygh.qq.ConsumerRegister;
+import com.github.rygh.qq.WorkEntityResolver;
 import com.github.rygh.qq.annotations.QQConsumer;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
-import com.github.rygh.qq.domain.Work;
+import com.github.rygh.qq.domain.EntityId;
 
 public class SpringConsumerRegisterSupplier {
 
-	private ApplicationContext applicationContext;
+	private final ApplicationContext applicationContext;
+	private final WorkEntityResolver entityResolver;
 	
-	public SpringConsumerRegisterSupplier(ApplicationContext applicationContext) {
+	public SpringConsumerRegisterSupplier(ApplicationContext applicationContext, WorkEntityResolver entityResolver) {
 		this.applicationContext = applicationContext;
+		this.entityResolver = entityResolver;
 	}
 
 	public ConsumerRegister createConsumerRegister() {
@@ -33,7 +36,7 @@ public class SpringConsumerRegisterSupplier {
 		return register;
 	}
 	
-	class ReflectiveConsumer implements Consumer<Work> {
+	class ReflectiveConsumer implements Consumer<EntityId> {
 		private final Object bean;
 		private final Method target;
 		
@@ -46,9 +49,14 @@ public class SpringConsumerRegisterSupplier {
 		}
 
 		@Override
-		public void accept(Work work) {
+		public void accept(EntityId id) {
 			try {
-				target.invoke(bean, work);
+				
+				// TODO: We can find the expected type here
+				// And use this to load from enttyLoader and match with EntityId
+				
+				Object entity = entityResolver.loadEntity(id);
+				target.invoke(bean, entity);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}

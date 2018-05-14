@@ -14,7 +14,7 @@ import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
+class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 
 	private final WorkPublisher publisher;
 

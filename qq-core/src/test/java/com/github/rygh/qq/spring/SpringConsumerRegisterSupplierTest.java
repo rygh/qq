@@ -11,8 +11,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.github.rygh.qq.WorkEntityResolver;
 import com.github.rygh.qq.annotations.QQConsumer;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
 
 @Configuration
@@ -20,8 +22,24 @@ public class SpringConsumerRegisterSupplierTest {
 
 	@Test
 	public void shouldRegisterAnnotatedBeans() {
+
+		WorkEntityResolver entityResolver = new WorkEntityResolver() {
+			@Override
+			public <T> T loadEntity(EntityId id) {
+				return null;
+			}
+			
+			@Override
+			public EntityId extractEntityId(Object obj) {
+				return null;
+			}
+		};
+		
+		AnnotationConfigApplicationContext applicationContext = 
+			new AnnotationConfigApplicationContext(SpringConsumerRegisterSupplierTest.class);
+		
 		SpringConsumerRegisterSupplier supplier = 
-			new SpringConsumerRegisterSupplier(new AnnotationConfigApplicationContext(SpringConsumerRegisterSupplierTest.class));
+			new SpringConsumerRegisterSupplier(applicationContext, entityResolver);
 		Set<String> registeredConsumers =  supplier.createConsumerRegister().getRegisteredConsumers();
 		
 		assertEquals(2, registeredConsumers.size());

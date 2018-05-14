@@ -40,8 +40,7 @@ public class UnitOfWork {
 		lockedWork.setStartedTime(LocalDateTime.now());
 		
 		// Locate consumer and provide work - consumer must load entity and perform processing
-		// We can plug in a consumer type that uses Spring to get beans and JPA to load entities
-		consumers.getConsumerFor(work).accept(lockedWork);
+		consumers.getConsumerFor(work).accept(lockedWork.asEntityId());
 		
 		lockedWork.setState(WorkState.COMPLETED).setCompletedTime(LocalDateTime.now());
 		repository.update(lockedWork); // DONE

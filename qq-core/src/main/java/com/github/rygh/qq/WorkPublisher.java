@@ -21,7 +21,7 @@ public class WorkPublisher {
 	}
 
 	public Work publish(Object payload, String consumer) {
-		EntityId entity = entityResolver.resolve(payload);
+		EntityId entity = entityResolver.extractEntityId(payload);
 		
 		Work work = workRepository.store(new Work(LocalDateTime.now(), entity.getEntityType(), entity.getEntityId(), consumer));
 		logger.debug("Publishing work {}", work);

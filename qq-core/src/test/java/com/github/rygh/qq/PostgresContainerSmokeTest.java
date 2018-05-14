@@ -61,8 +61,13 @@ public class PostgresContainerSmokeTest {
     	
     	WorkEntityResolver workEntityResolver = new WorkEntityResolver() {
 			@Override
-			public EntityId resolve(Object obj) {
+			public EntityId extractEntityId(Object obj) {
 				return new EntityId(obj.toString(), obj.getClass());
+			}
+
+			@Override
+			public <T> T loadEntity(EntityId id) {
+				return null;
 			}
 		};
     	
@@ -104,7 +109,7 @@ public class PostgresContainerSmokeTest {
     		this.publisher = publisher;
     	}
     	
-    	public void doSomeWork(Work work) {
+    	public void doSomeWork(EntityId work) {
     		logger.info("TestQueue, processing {}", work);
     		
     		Work published = publisher.publish("123", "SecondQueue");
@@ -113,7 +118,7 @@ public class PostgresContainerSmokeTest {
     }
     
     class SecondQueue {
-    	public void doSomeMoreWork(Work work) {
+    	public void doSomeMoreWork(EntityId work) {
     		logger.info("SecondQueue, processing {}", work);
     	}
     }

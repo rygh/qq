@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -85,12 +84,14 @@ public class PublisherAutowireResolverTest {
 	
 	@Test
 	public void shouldAutowireQueueProxy() {
-		ApplicationContext context = new AnnotationConfigApplicationContext(getClass());
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(getClass());
 		
 		SomeBean bean = context.getBean(SomeBean.class);
 		bean.doBeanStuff();
 	
 		assertThat(captured, hasItems("SomeQueueInterface", "SomeQueueClass"));
+		
+		context.close();
 	}
 	
 }
