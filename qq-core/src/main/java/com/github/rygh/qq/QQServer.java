@@ -36,6 +36,7 @@ public class QQServer {
 		QueueContext context = config.buildQueueContext();
 		
 		Duration freq = config.getPollingFrequency();
+		// TODO: Support adding multiple pool groups, each schedules its work-poller
 		poller.scheduleAtFixedRate(new WorkPoller(context, pool), 0, freq.toMillis(), TimeUnit.MILLISECONDS);
 		return context;
 	}

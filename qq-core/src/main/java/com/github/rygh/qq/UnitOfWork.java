@@ -47,6 +47,7 @@ public class UnitOfWork {
 	}
 	
 	public void handleError() {
+		// TODO: ErrorHandler
 		repository.update(work.setState(WorkState.FAILED)); // ERROR
 	}
 	
