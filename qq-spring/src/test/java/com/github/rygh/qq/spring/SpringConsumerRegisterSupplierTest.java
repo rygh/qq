@@ -11,7 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.github.rygh.qq.WorkEntityResolver;
+import com.github.rygh.qq.EntityResolver;
 import com.github.rygh.qq.annotations.QQConsumer;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
 import com.github.rygh.qq.domain.EntityId;
@@ -23,7 +23,7 @@ public class SpringConsumerRegisterSupplierTest {
 	@Test
 	public void shouldRegisterAnnotatedBeans() {
 
-		WorkEntityResolver entityResolver = new WorkEntityResolver() {
+		EntityResolver entityResolver = new EntityResolver() {
 			@Override
 			public <T> T loadEntity(EntityId id) {
 				return null;

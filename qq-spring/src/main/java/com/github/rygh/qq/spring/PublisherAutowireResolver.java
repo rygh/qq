@@ -1,5 +1,9 @@
 package com.github.rygh.qq.spring;
 
+import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
+import static net.bytebuddy.matcher.ElementMatchers.isPublic;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -12,7 +16,6 @@ import com.github.rygh.qq.annotations.QQWorkerMethod;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
-import net.bytebuddy.matcher.ElementMatchers;
 
 class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 
@@ -47,10 +50,9 @@ class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 			try {
 				return new ByteBuddy()
 				  .subclass(descriptor.getDependencyType())
-				  .method(
-						  ElementMatchers.isDeclaredBy(descriptor.getDependencyType())
-						  .and(ElementMatchers.isPublic())
-						  .and(ElementMatchers.isAnnotatedWith(QQWorkerMethod.class)))
+				  .method(isDeclaredBy(descriptor.getDependencyType())
+						  .and(isPublic())
+						  .and(isAnnotatedWith(QQWorkerMethod.class)))
 				  .intercept(InvocationHandlerAdapter.of(handler))
 				  .make()
 				  .load(descriptor.getDeclaredType().getClassLoader())

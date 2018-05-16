@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -28,7 +27,6 @@ public class PostgresContainerSmokeTest {
 
 	private final static Logger logger = LoggerFactory.getLogger(PostgresContainerSmokeTest.class);
 	
-    @NotNull
     @ClassRule
     public static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:latest");
     
@@ -59,7 +57,7 @@ public class PostgresContainerSmokeTest {
     	QueueConfig config = SpringConfigurationFactory.withSpringDefaults(getOrCreateDataSource());
     	WorkRepository workRepository = config.getWorkRepository();
     	
-    	WorkEntityResolver workEntityResolver = new WorkEntityResolver() {
+    	EntityResolver workEntityResolver = new EntityResolver() {
 			@Override
 			public EntityId extractEntityId(Object obj) {
 				return new EntityId(obj.toString(), obj.getClass());

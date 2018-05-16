@@ -13,9 +13,9 @@ public class WorkPublisher {
 	private final static Logger logger = LoggerFactory.getLogger(WorkPublisher.class);
 	
 	private final WorkRepository workRepository;
-	private final WorkEntityResolver entityResolver;
+	private final EntityResolver entityResolver;
 	
-	public WorkPublisher(WorkRepository workRepository, WorkEntityResolver entityResolver) {
+	public WorkPublisher(WorkRepository workRepository, EntityResolver entityResolver) {
 		this.workRepository = workRepository;
 		this.entityResolver = entityResolver;
 	}

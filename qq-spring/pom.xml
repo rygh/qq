@@ -9,12 +9,32 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>qq-core</artifactId>
+	<artifactId>qq-spring</artifactId>
 	<packaging>jar</packaging>
-	<name>QQ: Core</name>
+	<name>QQ: Spring Integration</name>
 
 	<dependencies>
-
+	   <dependency>
+	       <groupId>com.github.rygh</groupId>
+	       <artifactId>qq-core</artifactId>
+	   </dependency>
+	
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -38,6 +58,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

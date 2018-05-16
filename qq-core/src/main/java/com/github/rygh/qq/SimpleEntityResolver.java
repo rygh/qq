@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.github.rygh.qq.domain.EntityId;
 
-public class SimpleEntityResolver implements WorkEntityResolver {
+public class SimpleEntityResolver implements EntityResolver {
 
 	private final Map<Class<?>, Function<Object, EntityId>> extractors = new HashMap<>();
 	private final Map<Class<?>, Function<EntityId, Object>> suppliers = new HashMap<>();

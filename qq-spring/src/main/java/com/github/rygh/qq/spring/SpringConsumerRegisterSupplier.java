@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.springframework.context.ApplicationContext;
 
 import com.github.rygh.qq.ConsumerRegister;
-import com.github.rygh.qq.WorkEntityResolver;
+import com.github.rygh.qq.EntityResolver;
 import com.github.rygh.qq.annotations.QQConsumer;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
 import com.github.rygh.qq.domain.EntityId;
@@ -17,9 +17,9 @@ import com.github.rygh.qq.domain.EntityId;
 public class SpringConsumerRegisterSupplier {
 
 	private final ApplicationContext applicationContext;
-	private final WorkEntityResolver entityResolver;
+	private final EntityResolver entityResolver;
 	
-	public SpringConsumerRegisterSupplier(ApplicationContext applicationContext, WorkEntityResolver entityResolver) {
+	public SpringConsumerRegisterSupplier(ApplicationContext applicationContext, EntityResolver entityResolver) {
 		this.applicationContext = applicationContext;
 		this.entityResolver = entityResolver;
 	}
