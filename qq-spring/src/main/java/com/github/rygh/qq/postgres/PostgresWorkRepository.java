@@ -1,4 +1,4 @@
-package com.github.rygh.qq.spring;
+package com.github.rygh.qq.postgres;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,9 +19,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.github.rygh.qq.WorkRepository;
 import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
+import com.github.rygh.qq.repositories.WorkRepository;
 
 public class PostgresWorkRepository implements WorkRepository {
 
@@ -53,9 +54,8 @@ public class PostgresWorkRepository implements WorkRepository {
 	
 	@Override
 	public Stream<Work> findFirst(int count) {
-		String sql = "select * from work where state = :state order by created_time asc limit :limit";
-		SqlParameterSource params = new MapSqlParameterSource("state", "READY").addValue("limit", count);
-		return database.query(sql, params, new WorkRowMapper()).stream();
+		String sql = "select * from work order by created_time asc limit :limit";
+		return database.query(sql, new MapSqlParameterSource("limit", count), new WorkRowMapper()).stream();
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class PostgresWorkRepository implements WorkRepository {
 			.addValue("currentVersion", work.getVersion());
 		
 		if (database.update(sql, params) != 1) {
-			throw new IllegalStateException("Failed to update " + work + ", version has changed!");
+			throw new OptimisticLockingFailureException("Failed to update " + work + ", version has changed!");
 		}
 		
 		return work.setVersion(nextVersion);
@@ -140,15 +140,18 @@ public class PostgresWorkRepository implements WorkRepository {
 	 * - The updated items are returned to the caller
 	 */
 	@Override
-	public Stream<Work> claimNextReady(int count) {
+	public Stream<Work> claimNextReadyForPool(int count, String pool) {
 		String sql = 
 			"update work "
 			+ "set state = :processing "
 			+ "where id in "
 			+ "("
-			+ "	select id "
-			+ " from work "
-			+ " where state = :state "
+			+ "	select w.id "
+			+ " from work as w, consumer_definition as cd"
+			+ " where w.state = :state "
+			+ "   and cd.consumer_name = w.consumer "
+			+ "   and cd.pool = :pool "
+			+ "   and cd.enabled = TRUE "
 			+ " for update skip locked "
 			+ " limit :limit"
 			+ ") "
@@ -157,6 +160,7 @@ public class PostgresWorkRepository implements WorkRepository {
 		SqlParameterSource params = new MapSqlParameterSource()
 			.addValue("processing", WorkState.PROCESSING.name())
 			.addValue("state", WorkState.READY.name())
+			.addValue("pool", pool)
 			.addValue("limit", count);
 		
 		return transactionTemplate.execute(tx -> database.query(sql, params, new WorkRowMapper()).stream());

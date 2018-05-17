@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
+import com.github.rygh.qq.repositories.WorkRepository;
 
 public class WorkPublisher {
 

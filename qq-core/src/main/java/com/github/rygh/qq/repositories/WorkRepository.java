@@ -1,4 +1,4 @@
-package com.github.rygh.qq;
+package com.github.rygh.qq.repositories;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,5 +11,5 @@ public interface WorkRepository {
 	Work store(Work work);
 	Work update(Work work);
 	Stream<Work> findFirst(int count);
-	Stream<Work> claimNextReady(int count);
+	Stream<Work> claimNextReadyForPool(int count, String pool);
 }

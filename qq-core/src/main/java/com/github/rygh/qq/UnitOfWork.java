@@ -6,8 +6,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.rygh.qq.domain.ConsumerRegister;
 import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
+import com.github.rygh.qq.repositories.WorkRepository;
 
 public class UnitOfWork {
 

@@ -1,16 +1,14 @@
-package com.github.rygh.qq;
+package com.github.rygh.qq.domain;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.rygh.qq.domain.EntityId;
-import com.github.rygh.qq.domain.Work;
 
 public class ConsumerRegister {
 
@@ -37,9 +35,19 @@ public class ConsumerRegister {
 			throw new IllegalStateException("No consumer registered for " + work.getConsumer() + ", unable to process " + work);
 		};
 	}
-	
+
 	public Set<String> getRegisteredConsumers() {
 		return Collections.unmodifiableSet(consumers.keySet());
+	}
+	
+	public void verifyConsumers(QueueDefinitions definitions) {
+	 	Set<String> undefinedConsumers = getRegisteredConsumers().stream()
+			.filter(definitions.consumerIsDefined().negate())
+			.collect(Collectors.toSet());
+		
+	 	if (! undefinedConsumers.isEmpty()) {
+	 		throw new IllegalStateException("Undefined consumers found in the code " + undefinedConsumers.toString());
+	 	}
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.github.rygh.qq.QueueConfig;
+import com.github.rygh.qq.postgres.PostgresWorkRepository;
 
 public class SpringConfigurationFactory {
 
