@@ -32,6 +32,8 @@ public class QueueConfig {
 	
 	private String instanceId = UUID.randomUUID().toString();
 	private Optional<Integer> poolSize = Optional.empty();
+	private Optional<Integer> maxPoolSize = Optional.empty();
+	
 	private Supplier<ConsumerRegister> consumerSupplier = () -> new ConsumerRegister();
 	private TransactionalWorkerFactory transactionalWorkerFactory;
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
@@ -45,6 +47,11 @@ public class QueueConfig {
 
     public QueueConfig setConsumerRegister(ConsumerRegister register) {
     	this.consumerSupplier = () -> register;
+    	return this;
+    }
+    
+    public QueueConfig setConsumerRegisterSupplier(Supplier<ConsumerRegister> supplier) {
+    	this.consumerSupplier = supplier;
     	return this;
     }
     
@@ -72,12 +79,17 @@ public class QueueConfig {
 		return this;
 	}
 	
-	public int getCorePoolSize() {
-		return poolSize.orElseGet(() -> Runtime.getRuntime().availableProcessors());
+	private int getCorePoolSize() {
+		return poolSize.orElseGet(Runtime.getRuntime()::availableProcessors);
 	}
 	
-	public int getMaxPoolSize() {
-		return getCorePoolSize() * 5;
+	private int getMaxPoolSize() {
+		return maxPoolSize.orElseGet(() -> getCorePoolSize() * 5);
+	}
+	
+	public QueueConfig setMaxPoolSize(int size) {
+		maxPoolSize = Optional.of(size);
+		return this;
 	}
 	
 	public Duration getPollingFrequency() {

@@ -9,6 +9,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.github.rygh.qq.QueueConfig;
 import com.github.rygh.qq.postgres.PostgresWorkRepository;
 
+@Deprecated
 public class SpringConfigurationFactory {
 
 	public static QueueConfig withSpringDefaults(DataSource ds) {

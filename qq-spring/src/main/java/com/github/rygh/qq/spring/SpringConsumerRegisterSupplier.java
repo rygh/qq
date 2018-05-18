@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.springframework.context.ApplicationContext;
@@ -14,7 +15,7 @@ import com.github.rygh.qq.annotations.QQWorkerMethod;
 import com.github.rygh.qq.domain.ConsumerRegister;
 import com.github.rygh.qq.domain.EntityId;
 
-public class SpringConsumerRegisterSupplier {
+public class SpringConsumerRegisterSupplier implements Supplier<ConsumerRegister> {
 
 	private final ApplicationContext applicationContext;
 	private final EntityResolver entityResolver;
@@ -24,7 +25,8 @@ public class SpringConsumerRegisterSupplier {
 		this.entityResolver = entityResolver;
 	}
 
-	public ConsumerRegister createConsumerRegister() {
+	@Override
+	public ConsumerRegister get() {
 
 		ConsumerRegister register = new ConsumerRegister();
 		
@@ -67,4 +69,5 @@ public class SpringConsumerRegisterSupplier {
 			return "ReflectiveConsumer [bean=" + bean.getClass() + ", target=" + target + "]";
 		}
 	}
+
 }

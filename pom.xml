@@ -99,6 +99,7 @@
 	<modules>
 		<module>qq-core</module>
 		<module>qq-spring</module>
+		<module>qq-example-app</module>
 	</modules>
 
 </project>

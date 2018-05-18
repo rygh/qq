@@ -40,7 +40,7 @@ public class SpringConsumerRegisterSupplierTest {
 		
 		SpringConsumerRegisterSupplier supplier = 
 			new SpringConsumerRegisterSupplier(applicationContext, entityResolver);
-		Set<String> registeredConsumers =  supplier.createConsumerRegister().getRegisteredConsumers();
+		Set<String> registeredConsumers =  supplier.get().getRegisteredConsumers();
 		
 		assertEquals(2, registeredConsumers.size());
 		assertThat(registeredConsumers, hasItems("WhateverQueue", "SomeOtherQueue"));
