@@ -1,0 +1,10 @@
+spring:
+    datasource:
+        # Will use testcontainers to fire up a postgres container as long as docker is installed
+        driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+        url: jdbc:tc:postgresql:latest://hostname/databasename?TC_DAEMON=true
+        username: whatever
+        password: whateverbutsecret
+        initialization-mode: always
+        schema: classpath:pgsql_schema.sql
+        data: classpath:consumer-definitions.sql

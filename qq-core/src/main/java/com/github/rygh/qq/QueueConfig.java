@@ -31,12 +31,13 @@ public class QueueConfig {
 	private ConsumerDefinitionRepository consumerDefinitionRepository;
 	
 	private String instanceId = UUID.randomUUID().toString();
-	private Optional<Integer> poolSize = Optional.empty();
-	private Optional<Integer> maxPoolSize = Optional.empty();
+	private Optional<Integer> defaultCorePoolSize = Optional.empty();
+	private Optional<Integer> defaultMaxPoolSize = Optional.empty();
 	
 	private Supplier<ConsumerRegister> consumerSupplier = () -> new ConsumerRegister();
 	private TransactionalWorkerFactory transactionalWorkerFactory;
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
+	private EntityResolver entityResolver;
 	
 	private QueueConfig() {
 	}
@@ -49,6 +50,11 @@ public class QueueConfig {
     	this.consumerSupplier = () -> register;
     	return this;
     }
+    
+    public QueueConfig setEntityResolver(EntityResolver entityResolver) {
+		this.entityResolver = entityResolver;
+		return this;
+	}
     
     public QueueConfig setConsumerRegisterSupplier(Supplier<ConsumerRegister> supplier) {
     	this.consumerSupplier = supplier;
@@ -69,8 +75,8 @@ public class QueueConfig {
 		return workRepository;
 	}
 	
-	public QueueConfig setCorePoolSize(int size) {
-		poolSize = Optional.of(size);
+	public QueueConfig setDefaultCorePoolSize(int size) {
+		defaultCorePoolSize = Optional.of(size);
 		return this;
 	}
 	
@@ -79,16 +85,16 @@ public class QueueConfig {
 		return this;
 	}
 	
-	private int getCorePoolSize() {
-		return poolSize.orElseGet(Runtime.getRuntime()::availableProcessors);
+	private int getDefaultCorePoolSize() {
+		return defaultCorePoolSize.orElseGet(Runtime.getRuntime()::availableProcessors);
 	}
 	
-	private int getMaxPoolSize() {
-		return maxPoolSize.orElseGet(() -> getCorePoolSize() * 5);
+	private int getDefaultMaxPoolSize() {
+		return defaultMaxPoolSize.orElseGet(() -> getDefaultCorePoolSize() * 5);
 	}
 	
-	public QueueConfig setMaxPoolSize(int size) {
-		maxPoolSize = Optional.of(size);
+	public QueueConfig setDefaultMaxPoolSize(int size) {
+		defaultMaxPoolSize = Optional.of(size);
 		return this;
 	}
 	
@@ -118,13 +124,13 @@ public class QueueConfig {
 		final TransactionalWorkerFactory workerFactory = requireNonNull(transactionalWorkerFactory, "Transactional WorkerFactory must be set in config");
 		
 		List<ConsumerDefintition> definitions = consumerDefinitionRepository.findAll().collect(Collectors.toList());
-		DefaultPoolDefinition defaultPoolBuilder = new QueueDefinitions.DefaultPoolDefinition(getCorePoolSize(), getMaxPoolSize());
+		DefaultPoolDefinition defaultPoolBuilder = new QueueDefinitions.DefaultPoolDefinition(getDefaultCorePoolSize(), getDefaultMaxPoolSize());
 		final QueueDefinitions queueDefinitions = new QueueDefinitions(definitions, poolDefinitions, defaultPoolBuilder);
 		
+		WorkPublisher publisher = new WorkPublisher(workRepository, entityResolver);
 		register.verifyConsumers(queueDefinitions);
 		
-		return new QueueContext() {
-			
+		QueueContext context = new QueueContext() {
 			@Override
 			public String getInstanceId() {
 				return instanceId;
@@ -149,16 +155,23 @@ public class QueueConfig {
 			public Set<PoolDefinition> getWorkerPools() {
 				return queueDefinitions.getPoolDefinitions();
 			}
-			
+
+			@Override
+			public WorkPublisher getWorkPublisher() {
+				return publisher;
+			}
 		};
+		
+		
+		return context;
 	}
 	
     @Override
 	public String toString() {
 		return "Current QueueConfig\n"
 				+ "* WorkRepository......" + getWorkRepository().getClass() + "\n"
-				+ "* MaxPoolSize........." + getMaxPoolSize() + "\n"
-				+ "* CorePoolSize........" + getCorePoolSize() + "\n"
+				+ "* MaxPoolSize........." + getDefaultMaxPoolSize() + "\n"
+				+ "* CorePoolSize........" + getDefaultCorePoolSize() + "\n"
 				+ "* PollingFrequency...." + getPollingFrequency() + "\n";
 	}
 }

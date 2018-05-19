@@ -57,7 +57,7 @@ public class QueueDefinitions {
 		
 		public Supplier<PoolDefinition> createDefault(ConsumerDefintition consumer) {
 			return () -> {
-				logger.info("No pool definiton provided for {}, creating default pool for {}", consumer.getPool(), consumer);
+				logger.info("Creating pool {} using default settings for {}", consumer.getPool(), consumer);
 				return new PoolDefinition(consumer.getPool(), defaultCorePoolSize, defaultMaxPoolSize);
 			};
 		}

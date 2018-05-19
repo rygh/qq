@@ -2,11 +2,13 @@ package com.github.rygh.qq.example.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.github.rygh.qq.annotations.QQConsumer;
 import com.github.rygh.qq.annotations.QQPublish;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
 
+@Service
 @QQConsumer("rock-splitter")
 public class RockSplittingService {
 

@@ -12,4 +12,5 @@ public interface QueueContext {
 	WorkRepository getWorkRepository();
 	TransactionalWorkerFactory getTransactionalWorkerFactory();
 	Set<PoolDefinition> getWorkerPools();
+	WorkPublisher getWorkPublisher();
 }

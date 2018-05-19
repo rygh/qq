@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.SimpleAutowireCandidateResolver;
 
-import com.github.rygh.qq.WorkPublisher;
+import com.github.rygh.qq.QQContextHolder;
 import com.github.rygh.qq.annotations.QQPublish;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
 
@@ -18,12 +18,6 @@ import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
 
 class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
-
-	private final WorkPublisher publisher;
-
-	public PublisherAutowireResolver(WorkPublisher publisher) {
-		this.publisher = publisher;
-	}
 
 	@Override
 	public boolean isRequired(DependencyDescriptor descriptor) {
@@ -42,7 +36,9 @@ class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 						throw new IllegalArgumentException("WorkerMethod can only take a single parameter");
 					}
 					
-					publisher.publish(args[0], specification.value());
+					// Yeah so this is to get lazy behaviour and prevent nasty cycles of dependencies.
+					// I _could_ (and maybe I should) do this in a later BeanPostProcessor instead - but then again that means different nastyness.
+					QQContextHolder.getContext().getWorkPublisher().publish(args[0], specification.value());
 					return null;
 				}
 			};

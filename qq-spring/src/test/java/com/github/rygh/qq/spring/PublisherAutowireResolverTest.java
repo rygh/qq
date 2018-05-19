@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.github.rygh.qq.QQContextHolder;
 import com.github.rygh.qq.WorkPublisher;
 import com.github.rygh.qq.annotations.QQPublish;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
@@ -21,15 +23,23 @@ import com.github.rygh.qq.domain.Work;
 @Configuration
 public class PublisherAutowireResolverTest {
 
-	private static List<String> captured = new ArrayList<>();
+	private List<String> captured = new ArrayList<>();
 	
-	static WorkPublisher publisher = new WorkPublisher(null, null) {
-		@Override
-		public Work publish(Object payload, String consumer) {
-			captured.add(consumer);
-			return null;
-		}
-	};
+	@Before
+	public void beforeClass() {
+		QQContextHolder.setContext(new DummyQueueContext() {
+			@Override
+			public WorkPublisher getWorkPublisher() {
+				return new WorkPublisher(null, null) {
+					@Override
+					public Work publish(Object payload, String consumer) {
+						captured.add(consumer);
+						return null;
+					}
+				};
+			}
+		});
+	}
 	
 	public static interface SomeQueueInterface {
 		@QQWorkerMethod
@@ -61,8 +71,8 @@ public class PublisherAutowireResolverTest {
 	}
 	
 	@Bean
-	public static CustomizeAutowireCandidateResolver setupBeanFactory() {
-		return new CustomizeAutowireCandidateResolver(publisher);
+	public static CustomizeBeanFactoryAutorireResolver setupBeanFactory() {
+		return new CustomizeBeanFactoryAutorireResolver();
 	}
 	
 	@Bean

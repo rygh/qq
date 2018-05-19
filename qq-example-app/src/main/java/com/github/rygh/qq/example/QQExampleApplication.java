@@ -14,12 +14,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.github.rygh.qq.EntityResolver;
 import com.github.rygh.qq.QQServer;
 import com.github.rygh.qq.QueueConfig;
-import com.github.rygh.qq.WorkPublisher;
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.postgres.PostgresConsumerDefinitionRepository;
 import com.github.rygh.qq.postgres.PostgresWorkRepository;
 import com.github.rygh.qq.repositories.ConsumerDefinitionRepository;
 import com.github.rygh.qq.repositories.WorkRepository;
-import com.github.rygh.qq.spring.CustomizeAutowireCandidateResolver;
+import com.github.rygh.qq.spring.CustomizeBeanFactoryAutorireResolver;
 import com.github.rygh.qq.spring.QQSpringLifecycleBean;
 import com.github.rygh.qq.spring.SpringConsumerRegisterSupplier;
 import com.github.rygh.qq.spring.SpringTransactionalWorkerFactory;
@@ -40,8 +40,24 @@ public class QQExampleApplication {
 	}
 	
 	@Bean
-	public CustomizeAutowireCandidateResolver customizeAutowireCandidateResolver(WorkRepository workRepository, EntityResolver entityResolver) {
-		return new CustomizeAutowireCandidateResolver(new WorkPublisher(workRepository, entityResolver));
+	public EntityResolver entityResolver() {
+		return new EntityResolver() {
+			
+			@Override
+			public <T> T loadEntity(EntityId id) {
+				return null;
+			}
+			
+			@Override
+			public EntityId extractEntityId(Object obj) {
+				return null;
+			}
+		};
+	}
+	
+	@Bean
+	public static CustomizeBeanFactoryAutorireResolver customizeAutowireCandidateResolver() {
+		return new CustomizeBeanFactoryAutorireResolver();
 	}
 	
 	@Bean
@@ -49,6 +65,7 @@ public class QQExampleApplication {
 		return new PostgresConsumerDefinitionRepository(ds);
 	}
 	
+
 	@Bean
 	public QQSpringLifecycleBean queueLifecycle(
 			WorkRepository workRepository, 
@@ -62,12 +79,13 @@ public class QQExampleApplication {
 			.setWorkRepository(workRepository)
 			.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(createTransactionTemplate(ds, transactionManager)))
 			.setConsumerRegisterSupplier(new SpringConsumerRegisterSupplier(context, entityResolver))
-			.setConsumerDefinitionRepository(consumerDefinitionRepository);
+			.setConsumerDefinitionRepository(consumerDefinitionRepository)
+			.setEntityResolver(entityResolver);
 		
 		return new QQSpringLifecycleBean(new QQServer(config));
 	}
 	
 	public static void main(String[] args) {
-		SpringApplication.run(QQExampleApplication.class, args);
+		new SpringApplication(QQExampleApplication.class).run(args);
 	}
 }
