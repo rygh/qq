@@ -9,8 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.github.rygh.qq.EntityResolver;
 import com.github.rygh.qq.QQConfig;
@@ -21,7 +19,7 @@ import com.github.rygh.qq.postgres.PostgresWorkRepository;
 import com.github.rygh.qq.spring.CustomizeBeanFactoryAutorireResolver;
 import com.github.rygh.qq.spring.QQSpringLifecycleBean;
 import com.github.rygh.qq.spring.SpringConsumerRegisterSupplier;
-import com.github.rygh.qq.spring.SpringTransactionalWorkerFactory;
+import com.github.rygh.qq.spring.SpringTransactionWrapper;
 
 @SpringBootApplication
 public class QQExampleApplication {
@@ -36,14 +34,11 @@ public class QQExampleApplication {
 			DataSource ds,  PlatformTransactionManager transactionManager, 
 			ApplicationContext applicationContext, EntityManager entityManager) {
 		
-		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		
 		EntityResolver entityResolver = new JpaEntityResolver(entityManager);
 		
 		QQConfig config = QQConfig.withDefaults()
-			.setWorkRepository(new PostgresWorkRepository(ds, transactionTemplate))
-			.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(transactionTemplate))
+			.setWorkRepository(new PostgresWorkRepository(ds))
+			.setTransactionWrapper(new SpringTransactionWrapper(transactionManager))
 			.setConsumerRegisterSupplier(new SpringConsumerRegisterSupplier(applicationContext, entityResolver))
 			.setConsumerDefinitionRepository(new PostgresConsumerDefinitionRepository(ds))
 			.setEntityResolver(entityResolver);

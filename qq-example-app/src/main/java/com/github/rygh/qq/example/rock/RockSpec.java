@@ -6,6 +6,11 @@ public class RockSpec {
 	@NotBlank
 	private String name;
 
+	public RockSpec setName(String name) {
+		this.name = name;
+		return this;
+	}
+	
 	public String getName() {
 		return name;
 	}

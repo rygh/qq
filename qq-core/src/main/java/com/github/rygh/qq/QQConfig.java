@@ -35,7 +35,7 @@ public class QQConfig {
 	private Optional<Integer> defaultMaxPoolSize = Optional.empty();
 	
 	private Supplier<ConsumerRegister> consumerSupplier = () -> new ConsumerRegister();
-	private TransactionalWorkerFactory transactionalWorkerFactory;
+	private TransactionWrapper transactionWrapper;
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
 	private EntityResolver entityResolver;
 	
@@ -46,6 +46,10 @@ public class QQConfig {
 		return new QQConfig();
 	}
 
+	private TransactionWrapper getTransactionWrapper() {
+		return requireNonNull(transactionWrapper, "TransactionWrapper must be set in config");
+	}
+	
     public QQConfig setConsumerRegister(ConsumerRegister register) {
     	this.consumerSupplier = () -> register;
     	return this;
@@ -54,6 +58,10 @@ public class QQConfig {
     public QQConfig setEntityResolver(EntityResolver entityResolver) {
 		this.entityResolver = entityResolver;
 		return this;
+	}
+    
+    private EntityResolver getEntityResolver() {
+		return requireNonNull(entityResolver, "EntityResolver must be set in config");
 	}
     
     public QQConfig setConsumerRegisterSupplier(Supplier<ConsumerRegister> supplier) {
@@ -71,8 +79,17 @@ public class QQConfig {
 		return this;
 	}
 	
-	public WorkRepository getWorkRepository() {
-		return workRepository;
+	private ConsumerDefinitionRepository getConsumerDefinitionRepository() {
+		return requireNonNull(consumerDefinitionRepository, "ConsumerDefinitionRepository must be set in config");
+	}
+	
+	public QQConfig setTransactionWrapper(TransactionWrapper wrapper) {
+		this.transactionWrapper = wrapper;
+		return this;
+	}
+	
+	private WorkRepository getWorkRepository() {
+		return requireNonNull(workRepository, "WorkRepository must be set in config");
 	}
 	
 	public QQConfig setDefaultCorePoolSize(int size) {
@@ -102,11 +119,6 @@ public class QQConfig {
 		return Duration.of(1L, ChronoUnit.SECONDS);
 	}
 	
-	public QQConfig setTransactionalWorkerFactory(TransactionalWorkerFactory transactionalWorkerFactory) {
-		this.transactionalWorkerFactory = transactionalWorkerFactory;
-		return this;
-	}
-
 	public QQConfig setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 		return this;
@@ -120,10 +132,11 @@ public class QQConfig {
 		
 		logger.info("Consumers configured {}", register);
 		
-		final WorkRepository repository = requireNonNull(workRepository, "Work Repoistory must be set in the config");
-		final TransactionalWorkerFactory workerFactory = requireNonNull(transactionalWorkerFactory, "Transactional WorkerFactory must be set in config");
+		final WorkRepository repository = getWorkRepository();
+		final TransactionWrapper wrapper = getTransactionWrapper();
+		final String id = instanceId;
 		
-		List<ConsumerDefintition> definitions = consumerDefinitionRepository.findAll().collect(Collectors.toList());
+		List<ConsumerDefintition> definitions = getConsumerDefinitionRepository().findAll().collect(Collectors.toList());
 		DefaultPoolDefinition defaultPoolBuilder = new QueueDefinitions.DefaultPoolDefinition(getDefaultCorePoolSize(), getDefaultMaxPoolSize());
 		final QueueDefinitions queueDefinitions = new QueueDefinitions(definitions, poolDefinitions, defaultPoolBuilder);
 		
@@ -133,7 +146,7 @@ public class QQConfig {
 		QQContext context = new QQContext() {
 			@Override
 			public String getInstanceId() {
-				return instanceId;
+				return id;
 			}
 			
 			@Override
@@ -147,11 +160,6 @@ public class QQConfig {
 			}
 			
 			@Override
-			public TransactionalWorkerFactory getTransactionalWorkerFactory() {
-				return workerFactory;
-			}
-
-			@Override
 			public Set<PoolDefinition> getWorkerPools() {
 				return queueDefinitions.getPoolDefinitions();
 			}
@@ -159,6 +167,11 @@ public class QQConfig {
 			@Override
 			public WorkPublisher getWorkPublisher() {
 				return publisher;
+			}
+
+			@Override
+			public TransactionWrapper getTransactionWrapper() {
+				return wrapper;
 			}
 		};
 		
@@ -170,9 +183,14 @@ public class QQConfig {
     @Override
 	public String toString() {
 		return "Current QueueConfig\n"
-				+ "* WorkRepository......" + getWorkRepository().getClass() + "\n"
+				+ "* InstanceId.........." + instanceId + "\n"
 				+ "* MaxPoolSize........." + getDefaultMaxPoolSize() + "\n"
 				+ "* CorePoolSize........" + getDefaultCorePoolSize() + "\n"
-				+ "* PollingFrequency...." + getPollingFrequency() + "\n";
+				+ "* PollingFrequency...." + getPollingFrequency() + "\n"
+				+ "* WorkRepository......" + getWorkRepository() + "\n"
+				+ "* ConsumerRepository.." + getConsumerDefinitionRepository() + "\n"
+				+ "* EntityResolver......" + getEntityResolver() + "\n"
+				+ "* TransactionWrapper.." + getTransactionWrapper() + "\n"
+		;
 	}
 }

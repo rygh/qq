@@ -11,7 +11,6 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import com.github.rygh.qq.repositories.WorkRepository;
-import com.github.rygh.qq.spring.SpringConfigurationFactory;
 
 public class PostgresWorkRepositoryTest extends AbstractWorkRepositoryTest {
 
@@ -35,7 +34,7 @@ public class PostgresWorkRepositoryTest extends AbstractWorkRepositoryTest {
 			throw new RuntimeException(e);
 		}
 
-    	repository = SpringConfigurationFactory.withSpringDefaults(pds).getWorkRepository();
+    	repository = new PostgresWorkRepository(pds);
     }
 
 	@Override

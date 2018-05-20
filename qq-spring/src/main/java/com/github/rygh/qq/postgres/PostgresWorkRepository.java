@@ -17,7 +17,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
@@ -50,13 +49,10 @@ public class PostgresWorkRepository implements WorkRepository {
 	}
 	
 	private final NamedParameterJdbcTemplate database;
-	private TransactionTemplate transactionTemplate;
 	
-	public PostgresWorkRepository(DataSource dataSource, TransactionTemplate transactionTemplate) {
-		this.transactionTemplate = transactionTemplate;
+	public PostgresWorkRepository(DataSource dataSource) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.setFetchSize(1000);
-		jdbcTemplate.setLazyInit(false);
 		
 		this.database = new NamedParameterJdbcTemplate(jdbcTemplate);
 	}
@@ -146,7 +142,7 @@ public class PostgresWorkRepository implements WorkRepository {
 	}
  
 	/**
-	 * This method has its own transaction and does three actions
+	 * This method performs three actions in the database
 	 * - Items are locked up to the max count, skip locked is used so 
 	 * - Locked items are updated with the PROCESSING state to prevent visibility to others after the transaction
 	 * - The updated items are returned to the caller
@@ -175,7 +171,7 @@ public class PostgresWorkRepository implements WorkRepository {
 			.addValue("pool", pool)
 			.addValue("limit", count);
 		
-		return transactionTemplate.execute(tx -> database.query(sql, params, new WorkRowMapper()).stream());
+		return database.query(sql, params, new WorkRowMapper()).stream();
 	}
 
 }

@@ -15,16 +15,18 @@ public class WorkPoller implements Runnable {
 	
 	private final WorkRepository workRepository;
 	private final ThreadPoolExecutor pool;
-	private final TransactionalWorkerFactory workerFactory;
+	private final TransactionalUnitOfWorkFactory workerFactory;
+	private final TransactionWrapper transactionWrapper;
 	private final QQContext context;
 	private final String name;
 	
 	public WorkPoller(QQContext context, PoolDefinition definition) {
 		this.context = context;
 		this.workRepository = context.getWorkRepository();
-		this.workerFactory = context.getTransactionalWorkerFactory();
+		this.workerFactory = new TransactionalUnitOfWorkFactory(context);
 		this.pool = definition.createThreadPool();
 		this.name = definition.getName();
+		this.transactionWrapper = context.getTransactionWrapper();
 	}
 
 	private boolean poolIsShuttingDown() {
@@ -42,10 +44,10 @@ public class WorkPoller implements Runnable {
 			int approxFreeThreads = pool.getMaximumPoolSize() - pool.getActiveCount();
 			logger.debug("Queue is empty and pool {} got {} free threads, search for new work", name, approxFreeThreads);
 			
-			workRepository.claimNextReadyForPool(approxFreeThreads, name)
+			transactionWrapper.doInTransaction(() -> workRepository.claimNextReadyForPool(approxFreeThreads, name))
 				.map(work -> new UnitOfWork(context, work))
 				.map(workerFactory::createTransactionalWorkerFor)
-				.forEach(pool::execute); // TODO: Wrapper around pool?
+				.forEach(pool::execute);
 		}
 	}
 	

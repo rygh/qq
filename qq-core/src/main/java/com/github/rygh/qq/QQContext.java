@@ -10,7 +10,7 @@ public interface QQContext {
 	String getInstanceId();
 	ConsumerRegister getConsumerRegister();
 	WorkRepository getWorkRepository();
-	TransactionalWorkerFactory getTransactionalWorkerFactory();
+	TransactionWrapper getTransactionWrapper();
 	Set<PoolDefinition> getWorkerPools();
 	WorkPublisher getWorkPublisher();
 }

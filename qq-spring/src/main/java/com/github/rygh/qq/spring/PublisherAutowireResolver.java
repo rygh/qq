@@ -5,6 +5,7 @@ import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.springframework.beans.factory.config.DependencyDescriptor;
@@ -53,8 +54,9 @@ class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 				  .make()
 				  .load(descriptor.getDeclaredType().getClassLoader())
 				  .getLoaded()
+				  .getDeclaredConstructor()
 				  .newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				throw new RuntimeException(e);
 			}
 			
