@@ -14,14 +14,14 @@ import com.github.rygh.qq.repositories.WorkRepository;
 
 public class PostgresWorkRepositoryTest extends AbstractWorkRepositoryTest {
 
-    @ClassRule
-    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
-    
+	@ClassRule
+	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
+
 	private static WorkRepository repository;
-    
-    @BeforeClass
-    public static void setup() {
-    	
+
+	@BeforeClass
+	public static void setup() {
+
 		PGSimpleDataSource pds = new PGSimpleDataSource();
 		pds.setUser(postgres.getUsername());
 		pds.setPassword(postgres.getPassword());
@@ -34,8 +34,8 @@ public class PostgresWorkRepositoryTest extends AbstractWorkRepositoryTest {
 			throw new RuntimeException(e);
 		}
 
-    	repository = new PostgresWorkRepository(pds);
-    }
+		repository = new PostgresWorkRepository(pds);
+	}
 
 	@Override
 	protected WorkRepository getInstance() {
