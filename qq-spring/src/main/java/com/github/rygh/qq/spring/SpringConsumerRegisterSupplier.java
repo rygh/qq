@@ -53,7 +53,7 @@ public class SpringConsumerRegisterSupplier implements Supplier<ConsumerRegister
 		@Override
 		public void accept(EntityId id) {
 			try {
-				target.invoke(bean, entityResolver.loadEntity(id));
+				target.invoke(bean, (Object) entityResolver.loadEntity(id));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
