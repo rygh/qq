@@ -16,10 +16,10 @@ public class WorkPoller implements Runnable {
 	private final WorkRepository workRepository;
 	private final ThreadPoolExecutor pool;
 	private final TransactionalWorkerFactory workerFactory;
-	private final QueueContext context;
+	private final QQContext context;
 	private final String name;
 	
-	public WorkPoller(QueueContext context, PoolDefinition definition) {
+	public WorkPoller(QQContext context, PoolDefinition definition) {
 		this.context = context;
 		this.workRepository = context.getWorkRepository();
 		this.workerFactory = context.getTransactionalWorkerFactory();

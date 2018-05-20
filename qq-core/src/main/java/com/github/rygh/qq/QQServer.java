@@ -17,18 +17,18 @@ public class QQServer {
 	private static final Logger logger = LoggerFactory.getLogger(QQServer.class);
 	
 	private final ScheduledExecutorService scheduler;
-	private final QueueConfig config;
+	private final QQConfig config;
 	private final Set<WorkPoller> workPollers = new HashSet<>();
 	
-	public QQServer(QueueConfig config) {
+	public QQServer(QQConfig config) {
 		this.config = config;
 		this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("qq-poller"));
 	}
 	
-	public QueueContext start() {
+	public QQContext start() {
 		logger.info("Starting queue, good luck!\n{}", config);
 
-		QueueContext context = config.buildQueueContext();
+		QQContext context = config.buildQueueContext();
 
 		Duration freq = config.getPollingFrequency();
 		context.getWorkerPools().forEach(definition -> {

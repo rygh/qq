@@ -19,7 +19,7 @@ public class UnitOfWork {
 	private final ConsumerRegister consumers;
 	private final Work work;
 	
-	public UnitOfWork(QueueContext context, Work work) {
+	public UnitOfWork(QQContext context, Work work) {
 		this.work = work;
 		this.repository = context.getWorkRepository();
 		this.consumers = context.getConsumerRegister();

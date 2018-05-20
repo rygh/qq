@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class QQContextHolder {
 
-	private static QueueContext context;
+	private static QQContext context;
 	
-	public static QueueContext getContext() {
+	public static QQContext getContext() {
 		return Objects.requireNonNull(context, "QueueContext is null, accessed too early?");
 	}
 	
-	public static void setContext(QueueContext context) {
+	public static void setContext(QQContext context) {
 		QQContextHolder.context = context;
 	}
 	

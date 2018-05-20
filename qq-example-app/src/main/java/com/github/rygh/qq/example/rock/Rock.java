@@ -20,27 +20,17 @@ public class Rock {
 	private Rock() {
 	}
 
-	public Rock(RockSpec spec) {
+	public Rock(String name) {
 		this();
-		this.name = spec.getName();
+		this.name = name;
 	}
 	
 	public UUID getId() {
 		return id;
 	}
 
-	public Rock setId(UUID id) {
-		this.id = id;
-		return this;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public Rock setName(String name) {
-		this.name = name;
-		return this;
 	}
 
 	public List<RockFragment> smash() {

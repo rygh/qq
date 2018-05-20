@@ -4,31 +4,28 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.rygh</groupId>
+	<parent>
+		<groupId>com.github.rygh</groupId>
+		<artifactId>qq</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
 	<artifactId>qq-example-app</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>QQ: Spring-Boot Example App</name>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
-
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-		<qq.version>1.0-SNAPSHOT</qq.version>
+		<spring-boot.version>2.0.2.RELEASE</spring-boot.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.github.rygh</groupId>
 			<artifactId>qq-spring</artifactId>
-			<version>${qq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.rygh</groupId>
+			<artifactId>qq-jpa</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -38,13 +35,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -53,19 +55,34 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-			<version>1.7.3</version>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		  <scope>runtime</scope><!-- due to slight abuse of test-containers for this demo -->
 		</dependency>
-
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

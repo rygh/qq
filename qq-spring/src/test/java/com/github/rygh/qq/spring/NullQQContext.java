@@ -2,14 +2,14 @@ package com.github.rygh.qq.spring;
 
 import java.util.Set;
 
-import com.github.rygh.qq.QueueContext;
+import com.github.rygh.qq.QQContext;
 import com.github.rygh.qq.TransactionalWorkerFactory;
 import com.github.rygh.qq.WorkPublisher;
 import com.github.rygh.qq.domain.ConsumerRegister;
 import com.github.rygh.qq.domain.PoolDefinition;
 import com.github.rygh.qq.repositories.WorkRepository;
 
-class NullQueueContext implements QueueContext {
+class NullQQContext implements QQContext {
 
 	@Override
 	public String getInstanceId() {

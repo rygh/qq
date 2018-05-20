@@ -13,12 +13,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.github.rygh.qq.EntityResolver;
+import com.github.rygh.qq.QQConfig;
 import com.github.rygh.qq.QQServer;
-import com.github.rygh.qq.QueueConfig;
+import com.github.rygh.qq.jpa.JpaEntityResolver;
 import com.github.rygh.qq.postgres.PostgresConsumerDefinitionRepository;
 import com.github.rygh.qq.postgres.PostgresWorkRepository;
-import com.github.rygh.qq.repositories.ConsumerDefinitionRepository;
-import com.github.rygh.qq.repositories.WorkRepository;
 import com.github.rygh.qq.spring.CustomizeBeanFactoryAutorireResolver;
 import com.github.rygh.qq.spring.QQSpringLifecycleBean;
 import com.github.rygh.qq.spring.SpringConsumerRegisterSupplier;
@@ -26,28 +25,6 @@ import com.github.rygh.qq.spring.SpringTransactionalWorkerFactory;
 
 @SpringBootApplication
 public class QQExampleApplication {
-
-	
-	public TransactionTemplate createTransactionTemplate(DataSource ds, PlatformTransactionManager transactionManager) {
-		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		return transactionTemplate;
-	}
-	
-	@Bean
-	public WorkRepository workRepository(DataSource ds, PlatformTransactionManager transactionManager) {
-		return new PostgresWorkRepository(ds, createTransactionTemplate(ds, transactionManager));
-	}
-	
-	@Bean
-	public ConsumerDefinitionRepository consumerDefinitionRepository(DataSource ds) {
-		return new PostgresConsumerDefinitionRepository(ds);
-	}
-	
-	@Bean
-	public EntityResolver entityResolver(EntityManager em) {
-		return new JpaEntityResolver(em);
-	}
 	
 	@Bean
 	public static CustomizeBeanFactoryAutorireResolver customizeAutowireCandidateResolver() {
@@ -56,18 +33,19 @@ public class QQExampleApplication {
 
 	@Bean
 	public QQSpringLifecycleBean queueLifecycle(
-			WorkRepository workRepository, 
-			DataSource ds, 
-			PlatformTransactionManager transactionManager, 
-			ApplicationContext context, 
-			EntityResolver entityResolver, 
-			ConsumerDefinitionRepository consumerDefinitionRepository) {
+			DataSource ds,  PlatformTransactionManager transactionManager, 
+			ApplicationContext applicationContext, EntityManager entityManager) {
 		
-		QueueConfig config = QueueConfig.withDefaults()
-			.setWorkRepository(workRepository)
-			.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(createTransactionTemplate(ds, transactionManager)))
-			.setConsumerRegisterSupplier(new SpringConsumerRegisterSupplier(context, entityResolver))
-			.setConsumerDefinitionRepository(consumerDefinitionRepository)
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		
+		EntityResolver entityResolver = new JpaEntityResolver(entityManager);
+		
+		QQConfig config = QQConfig.withDefaults()
+			.setWorkRepository(new PostgresWorkRepository(ds, transactionTemplate))
+			.setTransactionalWorkerFactory(new SpringTransactionalWorkerFactory(transactionTemplate))
+			.setConsumerRegisterSupplier(new SpringConsumerRegisterSupplier(applicationContext, entityResolver))
+			.setConsumerDefinitionRepository(new PostgresConsumerDefinitionRepository(ds))
 			.setEntityResolver(entityResolver);
 		
 		return new QQSpringLifecycleBean(new QQServer(config));

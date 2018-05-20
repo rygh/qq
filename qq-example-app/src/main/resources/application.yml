@@ -6,7 +6,7 @@ spring:
         username: whatever
         password: whateverbutsecret
         initialization-mode: always
-        schema: classpath:pgsql_schema.sql
+        schema: classpath:sql/pgsql_schema.sql
         data: classpath:consumer-definitions.sql
         
     jpa:

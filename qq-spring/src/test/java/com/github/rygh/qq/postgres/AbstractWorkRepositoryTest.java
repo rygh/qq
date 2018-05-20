@@ -37,7 +37,7 @@ public abstract class AbstractWorkRepositoryTest {
 	}
 	
     protected Work createWork(String consumer, WorkState state) {
-    	return getInstance().store(new Work(LocalDateTime.now(), new EntityId(UUID.randomUUID().toString(), Object.class), consumer).setState(state));
+    	return getInstance().store(new Work(LocalDateTime.now(), new EntityId(Object.class).setEntityId(UUID.randomUUID()), consumer).setState(state));
     }
     
     @Test

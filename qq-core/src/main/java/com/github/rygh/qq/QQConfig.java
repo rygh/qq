@@ -23,9 +23,9 @@ import com.github.rygh.qq.domain.QueueDefinitions.DefaultPoolDefinition;
 import com.github.rygh.qq.repositories.ConsumerDefinitionRepository;
 import com.github.rygh.qq.repositories.WorkRepository;
 
-public class QueueConfig {
+public class QQConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger(QueueConfig.class);
+	private static final Logger logger = LoggerFactory.getLogger(QQConfig.class);
 	
 	private WorkRepository workRepository;
 	private ConsumerDefinitionRepository consumerDefinitionRepository;
@@ -39,34 +39,34 @@ public class QueueConfig {
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
 	private EntityResolver entityResolver;
 	
-	private QueueConfig() {
+	private QQConfig() {
 	}
 
-	public static QueueConfig withDefaults() {
-		return new QueueConfig();
+	public static QQConfig withDefaults() {
+		return new QQConfig();
 	}
 
-    public QueueConfig setConsumerRegister(ConsumerRegister register) {
+    public QQConfig setConsumerRegister(ConsumerRegister register) {
     	this.consumerSupplier = () -> register;
     	return this;
     }
     
-    public QueueConfig setEntityResolver(EntityResolver entityResolver) {
+    public QQConfig setEntityResolver(EntityResolver entityResolver) {
 		this.entityResolver = entityResolver;
 		return this;
 	}
     
-    public QueueConfig setConsumerRegisterSupplier(Supplier<ConsumerRegister> supplier) {
+    public QQConfig setConsumerRegisterSupplier(Supplier<ConsumerRegister> supplier) {
     	this.consumerSupplier = supplier;
     	return this;
     }
     
-	public QueueConfig setWorkRepository(WorkRepository workRepository) {
+	public QQConfig setWorkRepository(WorkRepository workRepository) {
 		this.workRepository = workRepository;
 		return this;
 	}
 	
-	public QueueConfig setConsumerDefinitionRepository(ConsumerDefinitionRepository consumerDefinitionRepository) {
+	public QQConfig setConsumerDefinitionRepository(ConsumerDefinitionRepository consumerDefinitionRepository) {
 		this.consumerDefinitionRepository = consumerDefinitionRepository;
 		return this;
 	}
@@ -75,12 +75,12 @@ public class QueueConfig {
 		return workRepository;
 	}
 	
-	public QueueConfig setDefaultCorePoolSize(int size) {
+	public QQConfig setDefaultCorePoolSize(int size) {
 		defaultCorePoolSize = Optional.of(size);
 		return this;
 	}
 	
-	public QueueConfig setPoolDefinitions(Set<PoolDefinition> definitions) {
+	public QQConfig setPoolDefinitions(Set<PoolDefinition> definitions) {
 		this.poolDefinitions = new HashSet<>(definitions);
 		return this;
 	}
@@ -93,7 +93,7 @@ public class QueueConfig {
 		return defaultMaxPoolSize.orElseGet(() -> getDefaultCorePoolSize() * 5);
 	}
 	
-	public QueueConfig setDefaultMaxPoolSize(int size) {
+	public QQConfig setDefaultMaxPoolSize(int size) {
 		defaultMaxPoolSize = Optional.of(size);
 		return this;
 	}
@@ -102,12 +102,12 @@ public class QueueConfig {
 		return Duration.of(1L, ChronoUnit.SECONDS);
 	}
 	
-	public QueueConfig setTransactionalWorkerFactory(TransactionalWorkerFactory transactionalWorkerFactory) {
+	public QQConfig setTransactionalWorkerFactory(TransactionalWorkerFactory transactionalWorkerFactory) {
 		this.transactionalWorkerFactory = transactionalWorkerFactory;
 		return this;
 	}
 
-	public QueueConfig setInstanceId(String instanceId) {
+	public QQConfig setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 		return this;
 	}
@@ -115,7 +115,7 @@ public class QueueConfig {
 	/**
 	 * Initialize required components from config and return immutable context
 	 */
-	public QueueContext buildQueueContext() {
+	public QQContext buildQueueContext() {
 		final ConsumerRegister register = requireNonNull(consumerSupplier.get(), "Consumer register or supplier must be set in config");
 		
 		logger.info("Consumers configured {}", register);
@@ -130,7 +130,7 @@ public class QueueConfig {
 		WorkPublisher publisher = new WorkPublisher(workRepository, entityResolver);
 		register.verifyConsumers(queueDefinitions);
 		
-		QueueContext context = new QueueContext() {
+		QQContext context = new QQContext() {
 			@Override
 			public String getInstanceId() {
 				return instanceId;

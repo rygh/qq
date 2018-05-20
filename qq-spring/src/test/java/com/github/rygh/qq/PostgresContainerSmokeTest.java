@@ -58,13 +58,13 @@ public class PostgresContainerSmokeTest {
     @Test(timeout = 15_000)
     public void publishWorkAndStartConsumer() throws SQLException {
     	
-    	QueueConfig config = SpringConfigurationFactory.withSpringDefaults(getOrCreateDataSource());
+    	QQConfig config = SpringConfigurationFactory.withSpringDefaults(getOrCreateDataSource());
     	WorkRepository workRepository = config.getWorkRepository();
     	
     	EntityResolver workEntityResolver = new EntityResolver() {
 			@Override
 			public EntityId extractEntityId(Object obj) {
-				return new EntityId(obj.toString(), obj.getClass());
+				return new EntityId(obj.getClass()).setEntityId(obj.toString());
 			}
 
 			@Override

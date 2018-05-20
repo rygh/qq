@@ -12,6 +12,7 @@ CREATE TABLE work (
 	completed_time      TIMESTAMP,
 	entity_class 		VARCHAR(255) NOT NULL,
 	entity_id 			VARCHAR(255) NOT NULL,
+	entity_id_class     VARCHAR(255) NOT NULL,
 	state 				VARCHAR(20) NOT NULL,
 	version             INT DEFAULT 1 NOT NULL,
 	consumer 			VARCHAR(255) REFERENCES consumer_definition (consumer_name)

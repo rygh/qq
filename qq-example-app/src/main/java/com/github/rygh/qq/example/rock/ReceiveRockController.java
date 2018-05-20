@@ -31,7 +31,7 @@ public class ReceiveRockController {
 	@PostMapping({"/", ""})
 	@Transactional
 	public ResponseEntity<Rock> createRock(@RequestBody @Valid RockSpec spec) {
-		Rock rock = repository.save(new Rock(spec));
+		Rock rock = repository.save(new Rock(spec.getName()));
 		rockSplittingService.smash(rock);
 		return ResponseEntity.created(URI.create("/api/rocks/" + rock.getId()))
 			.body(rock);

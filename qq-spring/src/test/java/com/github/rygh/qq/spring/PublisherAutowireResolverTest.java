@@ -28,7 +28,7 @@ public class PublisherAutowireResolverTest {
 	
 	@BeforeClass
 	public static void beforeClass() {
-		QQContextHolder.setContext(new NullQueueContext() {
+		QQContextHolder.setContext(new NullQQContext() {
 			@Override
 			public WorkPublisher getWorkPublisher() {
 				return new WorkPublisher(null, null) {
@@ -65,8 +65,8 @@ public class PublisherAutowireResolverTest {
 		
 		public void doBeanStuff() {
 			// Consumers should not accept work, but rather EntitySpec
-			queueInterface.doQueueStuff(new Work(LocalDateTime.now(), new EntityId("1", Object.class), "SomeQueueInterface"));
-			queueClass.doQueueStuff(new Work(LocalDateTime.now(), new EntityId("2", Object.class), "SomeQueueClass"));
+			queueInterface.doQueueStuff(new Work(LocalDateTime.now(), new EntityId(Object.class).setEntityId("1"), "SomeQueueInterface"));
+			queueClass.doQueueStuff(new Work(LocalDateTime.now(), new EntityId(Object.class).setEntityId("2"), "SomeQueueClass"));
 		}
 		
 	}

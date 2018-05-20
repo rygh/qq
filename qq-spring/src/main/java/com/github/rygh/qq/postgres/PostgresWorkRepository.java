@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
@@ -31,21 +30,18 @@ public class PostgresWorkRepository implements WorkRepository {
 		@Override
 		public Work mapRow(ResultSet rs, int rowNum) throws SQLException {
 			try {
-
-				UUID uuid = UUID.fromString(rs.getString("entity_id")); // TODO: Hack
-				Class<?> clazz = Class.forName(rs.getString("entity_class"));
+				Class<?> entityClass = Class.forName(rs.getString("entity_class"));
+				Class<?> idClass = Class.forName(rs.getString("entity_id_class"));
 				
-				EntityId entityId = new EntityId(uuid, clazz);
+				EntityId entityId = new EntityId(entityClass).setEntityId(rs.getString("entity_id"), idClass);
 				return new Work(rs.getLong("id"), nullsafe(rs.getTimestamp("created_time")), entityId, rs.getString("consumer"))
 						.setCompletedTime(nullsafe(rs.getTimestamp("completed_time")))
 						.setStartedTime(nullsafe(rs.getTimestamp("started_time")))
 						.setState(WorkState.valueOf(rs.getString("state")))
 						.setVersion(rs.getInt("version"));
 			} catch (Exception e) {
-				e.printStackTrace();
 				throw new SQLException(e);
 			}
-			
 		}
 		
 		private LocalDateTime nullsafe(Timestamp ts) {
@@ -95,6 +91,7 @@ public class PostgresWorkRepository implements WorkRepository {
 				+ " consumer, "
 				+ " entity_class, "
 				+ " entity_id, "
+				+ " entity_id_class, "
 				+ " state, "
 				+ " version "
 				+ ") values ("
@@ -102,6 +99,7 @@ public class PostgresWorkRepository implements WorkRepository {
 				+ " :consumer, "
 				+ " :entityClass, "
 				+ " :entityId, "
+				+ " :entityIdClass, "
 				+ " :state, "
 				+ " :version "
 				+ ") returning id";
@@ -110,6 +108,7 @@ public class PostgresWorkRepository implements WorkRepository {
 			.addValue("consumer", work.getConsumer())
 			.addValue("entityClass", work.getEntityId().getEntityType().getName())
 			.addValue("entityId", work.getEntityId().getEntityId())
+			.addValue("entityIdClass", work.getEntityId().getIdType().getName())
 			.addValue("state", work.getState().name())
 			.addValue("version",  work.getVersion());
 		
