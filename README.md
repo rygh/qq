@@ -17,6 +17,13 @@ The application will start a service including a dockerized postgres instance on
 
 Building and starting the application requires Docker installed, first execution will be slow as the image may need to be downloaded. The demo can be run against a different instance by modifying the application.yml.
 
+Test application can be started using the spring-boot plugin or however you want
+
+```sh
+cd qq-example-app
+mvn spring-boot:run
+```
+
 Create rock entities using 
 
 ```sh
