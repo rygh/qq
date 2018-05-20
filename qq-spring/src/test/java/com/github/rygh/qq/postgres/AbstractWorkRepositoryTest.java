@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
 import com.github.rygh.qq.repositories.WorkRepository;
@@ -36,7 +37,7 @@ public abstract class AbstractWorkRepositoryTest {
 	}
 	
     protected Work createWork(String consumer, WorkState state) {
-    	return getInstance().store(new Work(LocalDateTime.now(), Object.class.getName(), UUID.randomUUID().toString(), consumer).setState(state));
+    	return getInstance().store(new Work(LocalDateTime.now(), new EntityId(UUID.randomUUID().toString(), Object.class), consumer).setState(state));
     }
     
     @Test

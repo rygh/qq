@@ -7,21 +7,19 @@ public class Work {
 	private LocalDateTime createdTime;
 	private LocalDateTime startedTime;
 	private LocalDateTime completedTime;
-	private String entityType;
-	private String entityId;
 	private String consumer;
+	private EntityId entityId;
 	private WorkState state = WorkState.READY;
 	private int version = 1;
 	
-	public Work(LocalDateTime createdTime, String entityType, String entityId, String consumer) {
+	public Work(LocalDateTime createdTime, EntityId entityId, String consumer) {
 		this.createdTime = createdTime;
-		this.entityType = entityType;
 		this.entityId = entityId;
 		this.consumer = consumer;
 	}
 
-	public Work(Long id, LocalDateTime createdTime, String entityType, String entityId, String consumer) {
-		this(createdTime, entityType, entityId, consumer);
+	public Work(Long id, LocalDateTime createdTime, EntityId entityId, String consumer) {
+		this(createdTime, entityId, consumer);
 		this.id = id;
 	}
 
@@ -34,19 +32,7 @@ public class Work {
 		return this;
 	}
 	
-	public String getEntityType() {
-		return entityType;
-	}
-	
-	public Class<?> getEntityClass() {
-		try {
-			return Class.forName(entityType);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public String getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 	
@@ -105,7 +91,6 @@ public class Work {
 	@Override
 	public String toString() {
 		return "Work [id=" + id 
-				+ ", entityType=" + entityType 
 				+ ", entityId=" + entityId 
 				+ ", consumer=" + consumer
 				+ ", state=" + state 
@@ -113,7 +98,4 @@ public class Work {
 				+ "]";
 	}
 
-	public EntityId asEntityId() {
-		return new EntityId(entityId, entityType);
-	}
 }

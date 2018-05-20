@@ -1,6 +1,7 @@
 package com.github.rygh.qq.example;
 
 
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.springframework.boot.SpringApplication;
@@ -14,7 +15,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.github.rygh.qq.EntityResolver;
 import com.github.rygh.qq.QQServer;
 import com.github.rygh.qq.QueueConfig;
-import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.postgres.PostgresConsumerDefinitionRepository;
 import com.github.rygh.qq.postgres.PostgresWorkRepository;
 import com.github.rygh.qq.repositories.ConsumerDefinitionRepository;
@@ -40,31 +40,19 @@ public class QQExampleApplication {
 	}
 	
 	@Bean
-	public EntityResolver entityResolver() {
-		return new EntityResolver() {
-			
-			@Override
-			public <T> T loadEntity(EntityId id) {
-				return null;
-			}
-			
-			@Override
-			public EntityId extractEntityId(Object obj) {
-				return null;
-			}
-		};
+	public ConsumerDefinitionRepository consumerDefinitionRepository(DataSource ds) {
+		return new PostgresConsumerDefinitionRepository(ds);
+	}
+	
+	@Bean
+	public EntityResolver entityResolver(EntityManager em) {
+		return new JpaEntityResolver(em);
 	}
 	
 	@Bean
 	public static CustomizeBeanFactoryAutorireResolver customizeAutowireCandidateResolver() {
 		return new CustomizeBeanFactoryAutorireResolver();
 	}
-	
-	@Bean
-	public ConsumerDefinitionRepository consumerDefinitionRepository(DataSource ds) {
-		return new PostgresConsumerDefinitionRepository(ds);
-	}
-	
 
 	@Bean
 	public QQSpringLifecycleBean queueLifecycle(

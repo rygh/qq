@@ -11,10 +11,6 @@ public class QQContextHolder {
 	}
 	
 	public static void setContext(QueueContext context) {
-		if (context != null) {
-			throw new IllegalStateException("QueueContext already set");
-		}
-		
 		QQContextHolder.context = context;
 	}
 	

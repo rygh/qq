@@ -1,4 +1,4 @@
-package com.github.rygh.qq.example.services;
+package com.github.rygh.qq.example.rock;
 
 import org.springframework.stereotype.Service;
 

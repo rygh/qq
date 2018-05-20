@@ -34,15 +34,10 @@ public class SimpleEntityResolver implements EntityResolver {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T loadEntity(EntityId id) {
-		try {
-			Class<?> clazz = Class.forName(id.getEntityType());
-			if (! suppliers.containsKey(clazz)) {
-				throw new IllegalArgumentException("Unable to load entity for " + id);
-			}
-			
-			return (T) suppliers.get(clazz);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
+		if (! suppliers.containsKey(id.getEntityType())) {
+			throw new IllegalArgumentException("Unable to load entity for " + id);
 		}
+		
+		return (T) suppliers.get(id.getEntityType());
 	}
 }

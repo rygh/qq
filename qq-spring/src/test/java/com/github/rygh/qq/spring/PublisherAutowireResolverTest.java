@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -18,16 +18,17 @@ import com.github.rygh.qq.QQContextHolder;
 import com.github.rygh.qq.WorkPublisher;
 import com.github.rygh.qq.annotations.QQPublish;
 import com.github.rygh.qq.annotations.QQWorkerMethod;
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
 
 @Configuration
 public class PublisherAutowireResolverTest {
 
-	private List<String> captured = new ArrayList<>();
+	private static List<String> captured = new ArrayList<>();
 	
-	@Before
-	public void beforeClass() {
-		QQContextHolder.setContext(new DummyQueueContext() {
+	@BeforeClass
+	public static void beforeClass() {
+		QQContextHolder.setContext(new NullQueueContext() {
 			@Override
 			public WorkPublisher getWorkPublisher() {
 				return new WorkPublisher(null, null) {
@@ -64,8 +65,8 @@ public class PublisherAutowireResolverTest {
 		
 		public void doBeanStuff() {
 			// Consumers should not accept work, but rather EntitySpec
-			queueInterface.doQueueStuff(new Work(LocalDateTime.now(), Object.class.getName(), "1", "SomeQueueInterface"));
-			queueClass.doQueueStuff(new Work(LocalDateTime.now(), Object.class.getName(), "2", "SomeQueueClass"));
+			queueInterface.doQueueStuff(new Work(LocalDateTime.now(), new EntityId("1", Object.class), "SomeQueueInterface"));
+			queueClass.doQueueStuff(new Work(LocalDateTime.now(), new EntityId("2", Object.class), "SomeQueueClass"));
 		}
 		
 	}

@@ -8,3 +8,20 @@ spring:
         initialization-mode: always
         schema: classpath:pgsql_schema.sql
         data: classpath:consumer-definitions.sql
+        
+    jpa:
+        properties.hibernate.temp.use_jdbc_metadata_defaults: false
+        database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+        hibernate:
+            ddl-auto: update
+
+    jackson:
+        serialization:
+            indent_output: true
+
+logging:
+    level:
+        org.hibernate.tool.schema: ERROR
+        com.github.rygh: DEBUG
+        com.github.rygh.qq.WorkPoller: INFO
+        

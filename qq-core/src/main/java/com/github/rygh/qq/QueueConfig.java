@@ -162,6 +162,7 @@ public class QueueConfig {
 			}
 		};
 		
+		QQContextHolder.setContext(context);
 		
 		return context;
 	}

@@ -42,7 +42,7 @@ public class UnitOfWork {
 		lockedWork.setStartedTime(LocalDateTime.now());
 		
 		// Locate consumer and provide work - consumer must load entity and perform processing
-		consumers.getConsumerFor(work).accept(lockedWork.asEntityId());
+		consumers.getConsumerFor(work).accept(lockedWork.getEntityId());
 		
 		lockedWork.setState(WorkState.COMPLETED).setCompletedTime(LocalDateTime.now());
 		repository.update(lockedWork); // DONE
@@ -52,5 +52,9 @@ public class UnitOfWork {
 		// TODO: ErrorHandler
 		repository.update(work.setState(WorkState.FAILED)); // ERROR
 	}
-	
+
+	@Override
+	public String toString() {
+		return "UnitOfWork [work=" + work + "]";
+	}
 }

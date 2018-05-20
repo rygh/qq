@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
@@ -19,6 +20,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.github.rygh.qq.domain.EntityId;
 import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
 import com.github.rygh.qq.repositories.WorkRepository;
@@ -28,11 +30,22 @@ public class PostgresWorkRepository implements WorkRepository {
 	private final class WorkRowMapper implements RowMapper<Work> {
 		@Override
 		public Work mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Work(rs.getLong("id"), nullsafe(rs.getTimestamp("created_time")), rs.getString("entity_class"), rs.getString("entity_id"), rs.getString("consumer"))
-				.setCompletedTime(nullsafe(rs.getTimestamp("completed_time")))
-				.setStartedTime(nullsafe(rs.getTimestamp("started_time")))
-				.setState(WorkState.valueOf(rs.getString("state")))
-				.setVersion(rs.getInt("version"));
+			try {
+
+				UUID uuid = UUID.fromString(rs.getString("entity_id")); // TODO: Hack
+				Class<?> clazz = Class.forName(rs.getString("entity_class"));
+				
+				EntityId entityId = new EntityId(uuid, clazz);
+				return new Work(rs.getLong("id"), nullsafe(rs.getTimestamp("created_time")), entityId, rs.getString("consumer"))
+						.setCompletedTime(nullsafe(rs.getTimestamp("completed_time")))
+						.setStartedTime(nullsafe(rs.getTimestamp("started_time")))
+						.setState(WorkState.valueOf(rs.getString("state")))
+						.setVersion(rs.getInt("version"));
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new SQLException(e);
+			}
+			
 		}
 		
 		private LocalDateTime nullsafe(Timestamp ts) {
@@ -95,8 +108,8 @@ public class PostgresWorkRepository implements WorkRepository {
 		
 		SqlParameterSource params = new MapSqlParameterSource("created", work.getCreatedTime())
 			.addValue("consumer", work.getConsumer())
-			.addValue("entityClass", work.getEntityType())
-			.addValue("entityId", work.getEntityId())
+			.addValue("entityClass", work.getEntityId().getEntityType().getName())
+			.addValue("entityId", work.getEntityId().getEntityId())
 			.addValue("state", work.getState().name())
 			.addValue("version",  work.getVersion());
 		

@@ -9,7 +9,7 @@ import com.github.rygh.qq.domain.ConsumerRegister;
 import com.github.rygh.qq.domain.PoolDefinition;
 import com.github.rygh.qq.repositories.WorkRepository;
 
-class DummyQueueContext implements QueueContext {
+class NullQueueContext implements QueueContext {
 
 	@Override
 	public String getInstanceId() {
