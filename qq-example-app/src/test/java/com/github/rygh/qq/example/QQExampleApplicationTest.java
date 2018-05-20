@@ -1,5 +1,7 @@
 package com.github.rygh.qq.example;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +29,7 @@ public class QQExampleApplicationTest {
 		rest.postForLocation("/api/rocks", new RockSpec().setName("HELP"));
 		while (!areWeThereYet()) {
 			try {
-				TimeUnit.MILLISECONDS.sleep(200);
+				TimeUnit.MILLISECONDS.sleep(100);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -35,8 +37,9 @@ public class QQExampleApplicationTest {
 	}
 	
 	private boolean areWeThereYet() {
-		Job[] jobs = rest.getForObject("/api/jobs", Job[].class);
-		return jobs.length == 5 && Arrays.stream(jobs).allMatch(j -> j.getState() == WorkState.COMPLETED);
+		return Arrays.stream(rest.getForObject("/api/jobs", Job[].class))
+			.map(Job::getState)
+			.filter(isEqual(WorkState.COMPLETED)).count() == 5;
  	}
 
 }
