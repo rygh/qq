@@ -71,9 +71,26 @@ public class PublisherAutowireResolverTest {
 		
 	}
 	
+	public static class ConstructorBean {
+		private final SomeQueueInterface queue;
+		
+		public ConstructorBean(SomeQueueInterface queue) {
+			this.queue = queue;
+		}
+
+		public void doBeanStuff() {
+			queue.doQueueStuff(null);
+		}
+	}
+	
 	@Bean
 	public static CustomizeBeanFactoryAutorireResolver setupBeanFactory() {
 		return new CustomizeBeanFactoryAutorireResolver();
+	}
+
+	@Bean
+	public ConstructorBean constructorBean(@QQPublish("SomeQueueInterface") SomeQueueInterface queue) {
+		return new ConstructorBean(queue);
 	}
 	
 	@Bean
@@ -100,6 +117,9 @@ public class PublisherAutowireResolverTest {
 		SomeBean bean = context.getBean(SomeBean.class);
 		bean.doBeanStuff();
 	
+		ConstructorBean cbean = context.getBean(ConstructorBean.class);
+		cbean.doBeanStuff();
+		
 		assertThat(captured, hasItems("SomeQueueInterface", "SomeQueueClass"));
 		
 		context.close();

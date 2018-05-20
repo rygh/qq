@@ -40,4 +40,9 @@ public class RockFragment {
 		return parent;
 	}
 
+	@Override
+	public String toString() {
+		return "RockFragment [id=" + id + ", letter=" + letter + ", parent=" + parent + "]";
+	}
+	
 }

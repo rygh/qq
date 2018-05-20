@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +21,13 @@ import com.github.rygh.qq.annotations.QQPublish;
 @RequestMapping(path = "/api/rocks")
 public class ReceiveRockController {
 
-	@QQPublish("rock-splitter")
-	private RockSplittingService rockSplittingService;
+	private final RockSplittingService rockSplittingService;
+	private final RockRepository repository;
 	
-	@Autowired
-	private RockRepository repository;
+	public ReceiveRockController(@QQPublish("rock-splitter") RockSplittingService rockService, RockRepository repository) {
+		this.rockSplittingService = rockService;
+		this.repository = repository;
+	}
 	
 	@PostMapping({"/", ""})
 	@Transactional
