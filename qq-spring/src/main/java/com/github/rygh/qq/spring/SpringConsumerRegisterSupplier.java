@@ -53,12 +53,7 @@ public class SpringConsumerRegisterSupplier implements Supplier<ConsumerRegister
 		@Override
 		public void accept(EntityId id) {
 			try {
-				
-				// TODO: We can find the expected type here
-				// And use this to load from enttyLoader and match with EntityId
-				
-				Object entity = entityResolver.loadEntity(id);
-				target.invoke(bean, entity);
+				target.invoke(bean, entityResolver.loadEntity(id));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}

@@ -16,7 +16,7 @@ import com.github.rygh.qq.QQServer;
 import com.github.rygh.qq.jpa.JpaEntityResolver;
 import com.github.rygh.qq.postgres.PostgresConsumerDefinitionRepository;
 import com.github.rygh.qq.postgres.PostgresWorkRepository;
-import com.github.rygh.qq.spring.CustomizeBeanFactoryAutorireResolver;
+import com.github.rygh.qq.spring.CustomizeBeanFactoryAutowireResolver;
 import com.github.rygh.qq.spring.QQSpringLifecycleBean;
 import com.github.rygh.qq.spring.SpringConsumerRegisterSupplier;
 import com.github.rygh.qq.spring.SpringTransactionWrapper;
@@ -25,8 +25,8 @@ import com.github.rygh.qq.spring.SpringTransactionWrapper;
 public class QQExampleApplication {
 	
 	@Bean
-	public static CustomizeBeanFactoryAutorireResolver customizeAutowireCandidateResolver() {
-		return new CustomizeBeanFactoryAutorireResolver();
+	public static CustomizeBeanFactoryAutowireResolver customizeAutowireCandidateResolver() {
+		return new CustomizeBeanFactoryAutowireResolver();
 	}
 
 	@Bean

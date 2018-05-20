@@ -46,7 +46,8 @@ class PublisherAutowireResolver extends SimpleAutowireCandidateResolver {
 				Class<?> dynamic = new ByteBuddy()
 					.subclass(clazz)
 					.method(isDeclaredBy(clazz).and(isPublic()).and(isAnnotatedWith(QQWorkerMethod.class)))
-					.intercept(InvocationHandlerAdapter.of(new PublishInvocationHandler(specification.value()))).make()
+					.intercept(InvocationHandlerAdapter.of(new PublishInvocationHandler(specification.value())))
+					.make()
 					.load(descriptor.getDeclaredType().getClassLoader())
 					.getLoaded();
 

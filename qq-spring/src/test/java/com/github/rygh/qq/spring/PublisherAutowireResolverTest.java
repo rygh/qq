@@ -84,8 +84,8 @@ public class PublisherAutowireResolverTest {
 	}
 	
 	@Bean
-	public static CustomizeBeanFactoryAutorireResolver setupBeanFactory() {
-		return new CustomizeBeanFactoryAutorireResolver();
+	public static CustomizeBeanFactoryAutowireResolver setupBeanFactory() {
+		return new CustomizeBeanFactoryAutowireResolver();
 	}
 
 	@Bean
