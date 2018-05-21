@@ -10,6 +10,10 @@ public class Work {
 	private String consumer;
 	private EntityId entityId;
 	private WorkState state = WorkState.READY;
+	
+	private int executionCount = 0;
+	private String errorMessage;
+	
 	private int version = 1;
 	
 	public Work(LocalDateTime createdTime, EntityId entityId, String consumer) {
@@ -88,6 +92,29 @@ public class Work {
 		return this.state == requestedState;
 	}
 	
+	public int getExecutionCount() {
+		return executionCount;
+	}
+
+	public Work setExecutionCount(int executionCount) {
+		this.executionCount = executionCount;
+		return this;
+	}
+	
+	public Work incrementExecutionCount() {
+		this.executionCount++;
+		return this;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public Work setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+		return this;
+	}
+
 	@Override
 	public String toString() {
 		return "Work [id=" + id 

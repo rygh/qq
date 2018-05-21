@@ -62,4 +62,8 @@ public class QueueDefinitions {
 			};
 		}
 	}
+
+	public Map<String, ConsumerDefintition> getConsumerDefinitions() {
+		return consumers;
+	}
 }

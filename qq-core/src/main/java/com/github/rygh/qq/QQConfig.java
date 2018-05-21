@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,6 +21,8 @@ import com.github.rygh.qq.domain.ConsumerRegister;
 import com.github.rygh.qq.domain.PoolDefinition;
 import com.github.rygh.qq.domain.QueueDefinitions;
 import com.github.rygh.qq.domain.QueueDefinitions.DefaultPoolDefinition;
+import com.github.rygh.qq.error.DefaultErrorHandler;
+import com.github.rygh.qq.error.ErrorHandler;
 import com.github.rygh.qq.repositories.ConsumerDefinitionRepository;
 import com.github.rygh.qq.repositories.WorkRepository;
 
@@ -38,6 +41,8 @@ public class QQConfig {
 	private TransactionWrapper transactionWrapper;
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
 	private EntityResolver entityResolver;
+	
+	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	
 	private QQConfig() {
 	}
@@ -76,6 +81,11 @@ public class QQConfig {
 	
 	public QQConfig setConsumerDefinitionRepository(ConsumerDefinitionRepository consumerDefinitionRepository) {
 		this.consumerDefinitionRepository = consumerDefinitionRepository;
+		return this;
+	}
+	
+	public QQConfig setErrorHandler(ErrorHandler errorHandler) {
+		this.errorHandler = errorHandler;
 		return this;
 	}
 	
@@ -137,6 +147,7 @@ public class QQConfig {
 		
 		final WorkRepository repository = getWorkRepository();
 		final TransactionWrapper wrapper = getTransactionWrapper();
+		final ErrorHandler error = errorHandler;
 		final String id = instanceId;
 		
 		List<ConsumerDefintition> definitions = getConsumerDefinitionRepository().findAll().collect(Collectors.toList());
@@ -166,6 +177,11 @@ public class QQConfig {
 			public Set<PoolDefinition> getWorkerPools() {
 				return queueDefinitions.getPoolDefinitions();
 			}
+			
+			@Override
+			public Map<String, ConsumerDefintition> getConsumerDefinitions() {
+				return queueDefinitions.getConsumerDefinitions();
+			}
 
 			@Override
 			public WorkPublisher getWorkPublisher() {
@@ -175,6 +191,11 @@ public class QQConfig {
 			@Override
 			public TransactionWrapper getTransactionWrapper() {
 				return wrapper;
+			}
+
+			@Override
+			public ErrorHandler getErrorHandler() {
+				return error;
 			}
 		};
 		
@@ -195,6 +216,7 @@ public class QQConfig {
 			+ "* EntityResolver......" + entityResolver + "\n"
 			+ "* TransactionWrapper.." + transactionWrapper + "\n"
 			+ "* ConsumerRegister...." + consumerSupplier + "\n"
+			+ "* ErrorHandler........" + errorHandler + "\n"
 		;
 	}
 }
