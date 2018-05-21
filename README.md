@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rygh/qq.svg?branch=master)](https://travis-ci.org/rygh/qq)
+
 QQ
 ============
 
