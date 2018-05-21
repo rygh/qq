@@ -8,10 +8,10 @@ Simple database work queue. Enables defining workers and transactional borders i
 
 Modules
 ===========
-qq-core - basic classes and interfaces for the setup, doesn't do anything useful without actual implementations
-qq-spring - implements repositories and adds annotations for injecting workers and executing work
-qq-jpa - entity loader that allows using JPA entities in consumers
-qq-example-app - Example application that shows a setup using Spring and JPA
+* qq-core - basic classes and interfaces for the setup, doesn't do anything useful without actual implementations
+* qq-spring - implements repositories and adds annotations for injecting workers and executing work
+* qq-jpa - entity loader that allows using JPA entities in consumers
+* qq-example-app - Example application that shows a setup using Spring and JPA
 
 Example application
 ============
