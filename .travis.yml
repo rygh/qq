@@ -2,10 +2,12 @@ language: java
 
 jdk:
   - oraclejdk9
-	- oraclejdk8
+  - oraclejdk8
 
 sudo: required
 
 services:
   - docker
 
+notifications:
+  email: false
