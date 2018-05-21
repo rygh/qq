@@ -34,7 +34,7 @@ public class QQConfig {
 	private Optional<Integer> defaultCorePoolSize = Optional.empty();
 	private Optional<Integer> defaultMaxPoolSize = Optional.empty();
 	
-	private Supplier<ConsumerRegister> consumerSupplier = () -> new ConsumerRegister();
+	private Supplier<ConsumerRegister> consumerSupplier;
 	private TransactionWrapper transactionWrapper;
 	private Set<PoolDefinition> poolDefinitions = new HashSet<>();
 	private EntityResolver entityResolver;
@@ -124,12 +124,15 @@ public class QQConfig {
 		return this;
 	}
 	
+	private Supplier<ConsumerRegister> getConsumerRegisterSupplier() {
+		return requireNonNull(consumerSupplier, "Consumer register or supplier must be set in config"); 
+	}
+	
 	/**
 	 * Initialize required components from config and return immutable context
 	 */
 	public QQContext buildQueueContext() {
-		final ConsumerRegister register = requireNonNull(consumerSupplier.get(), "Consumer register or supplier must be set in config");
-		
+		final ConsumerRegister register = getConsumerRegisterSupplier().get();
 		logger.info("Consumers configured {}", register);
 		
 		final WorkRepository repository = getWorkRepository();
@@ -140,7 +143,7 @@ public class QQConfig {
 		DefaultPoolDefinition defaultPoolBuilder = new QueueDefinitions.DefaultPoolDefinition(getDefaultCorePoolSize(), getDefaultMaxPoolSize());
 		final QueueDefinitions queueDefinitions = new QueueDefinitions(definitions, poolDefinitions, defaultPoolBuilder);
 		
-		WorkPublisher publisher = new WorkPublisher(workRepository, entityResolver);
+		WorkPublisher publisher = new WorkPublisher(repository, getEntityResolver());
 		register.verifyConsumers(queueDefinitions);
 		
 		QQContext context = new QQContext() {
@@ -183,14 +186,15 @@ public class QQConfig {
     @Override
 	public String toString() {
 		return "Current QueueConfig\n"
-				+ "* InstanceId.........." + instanceId + "\n"
-				+ "* MaxPoolSize........." + getDefaultMaxPoolSize() + "\n"
-				+ "* CorePoolSize........" + getDefaultCorePoolSize() + "\n"
-				+ "* PollingFrequency...." + getPollingFrequency() + "\n"
-				+ "* WorkRepository......" + getWorkRepository() + "\n"
-				+ "* ConsumerRepository.." + getConsumerDefinitionRepository() + "\n"
-				+ "* EntityResolver......" + getEntityResolver() + "\n"
-				+ "* TransactionWrapper.." + getTransactionWrapper() + "\n"
+			+ "* InstanceId.........." + instanceId + "\n"
+			+ "* MaxPoolSize........." + getDefaultMaxPoolSize() + "\n"
+			+ "* CorePoolSize........" + getDefaultCorePoolSize() + "\n"
+			+ "* PollingFrequency...." + getPollingFrequency() + "\n"
+			+ "* WorkRepository......" + workRepository + "\n"
+			+ "* ConsumerRepository.." + consumerDefinitionRepository + "\n"
+			+ "* EntityResolver......" + entityResolver + "\n"
+			+ "* TransactionWrapper.." + transactionWrapper + "\n"
+			+ "* ConsumerRegister...." + consumerSupplier + "\n"
 		;
 	}
 }
