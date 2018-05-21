@@ -57,12 +57,6 @@ public class PostgresWorkRepository implements WorkRepository {
 		this.database = new NamedParameterJdbcTemplate(jdbcTemplate);
 	}
 	
-	@Override
-	public Stream<Work> findFirst(int count) {
-		String sql = "select * from work order by created_time asc limit :limit";
-		return database.query(sql, new MapSqlParameterSource("limit", count), new WorkRowMapper()).stream();
-	}
-
 	/**
 	 * Returns the work entity if not locked by any other thread
 	 * Entity will remain locked for the period of the external transaction this method in called in

@@ -15,7 +15,6 @@ public class WorkPoller implements Runnable {
 	
 	private final WorkRepository workRepository;
 	private final ThreadPoolExecutor pool;
-	private final TransactionalUnitOfWorkFactory workerFactory;
 	private final TransactionWrapper transactionWrapper;
 	private final QQContext context;
 	private final String name;
@@ -23,7 +22,6 @@ public class WorkPoller implements Runnable {
 	public WorkPoller(QQContext context, PoolDefinition definition) {
 		this.context = context;
 		this.workRepository = context.getWorkRepository();
-		this.workerFactory = new TransactionalUnitOfWorkFactory(context);
 		this.pool = definition.createThreadPool();
 		this.name = definition.getName();
 		this.transactionWrapper = context.getTransactionWrapper();
@@ -46,7 +44,6 @@ public class WorkPoller implements Runnable {
 			
 			transactionWrapper.doInTransaction(() -> workRepository.claimNextReadyForPool(approxFreeThreads, name))
 				.map(work -> new UnitOfWork(context, work))
-				.map(workerFactory::createTransactionalWorkerFor)
 				.forEach(pool::execute);
 		}
 	}

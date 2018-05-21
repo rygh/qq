@@ -10,6 +10,5 @@ public interface WorkRepository {
 	Optional<Work> getById(Long id);
 	Work store(Work work);
 	Work update(Work work);
-	Stream<Work> findFirst(int count);
 	Stream<Work> claimNextReadyForPool(int count, String pool);
 }

@@ -11,10 +11,11 @@ import com.github.rygh.qq.domain.Work;
 import com.github.rygh.qq.domain.WorkState;
 import com.github.rygh.qq.repositories.WorkRepository;
 
-public class UnitOfWork {
+public class UnitOfWork implements Runnable {
 
 	private final static Logger logger = LoggerFactory.getLogger(UnitOfWork.class);
 	
+	private final TransactionWrapper transactionWrapper;
 	private final WorkRepository repository;
 	private final ConsumerRegister consumers;
 	private final Work work;
@@ -23,12 +24,25 @@ public class UnitOfWork {
 		this.work = work;
 		this.repository = context.getWorkRepository();
 		this.consumers = context.getConsumerRegister();
+		this.transactionWrapper = context.getTransactionWrapper();
+	}
+	
+	@Override
+	public void run() {
+		logger.debug("Executing work {}", work);
+		try {
+			transactionWrapper.doInTransaction(this::attemptTask);
+		} catch (Throwable t) {
+			logger.error("Horrible error while processing " + work, t);
+			// Failure, work transaction was rolled back, update state 
+			transactionWrapper.doInTransaction(this::handleError);
+		}
 	}
 	
 	/**
 	 * Should return something, this is kind of scriptish
 	 */
-	public void doWork() {
+	private void attemptTask() {
 		// Attempt to lock work-item -> If not available some other consumer got it, exit!
 		// Item remains locked for the duration of the job, this state is currently invisible to the outside!
 		Optional<Work> lockedItem = repository.getByIdWithLock(work.getId());
@@ -45,12 +59,12 @@ public class UnitOfWork {
 		consumers.getConsumerFor(work).accept(lockedWork.getEntityId());
 		
 		lockedWork.setState(WorkState.COMPLETED).setCompletedTime(LocalDateTime.now());
-		repository.update(lockedWork); // DONE
+		repository.update(lockedWork);
 	}
 	
-	public void handleError() {
+	private void handleError() {
 		// TODO: ErrorHandler
-		repository.update(work.setState(WorkState.FAILED)); // ERROR
+		repository.update(work.setState(WorkState.FAILED));
 	}
 
 	@Override
