@@ -37,6 +37,8 @@ public class PostgresWorkRepository implements WorkRepository {
 						.setCompletedTime(nullsafe(rs.getTimestamp("completed_time")))
 						.setStartedTime(nullsafe(rs.getTimestamp("started_time")))
 						.setState(WorkState.valueOf(rs.getString("state")))
+						.setErrorMessage(rs.getString("error_message"))
+						.setExecutionCount(rs.getInt("execution_count"))
 						.setVersion(rs.getInt("version"));
 			} catch (Exception e) {
 				throw new SQLException(e);
@@ -116,6 +118,8 @@ public class PostgresWorkRepository implements WorkRepository {
 			+ " started_time = :started, "
 			+ " completed_time = :completed, "
 			+ " state = :state, "
+			+ " execution_count = :executionCount, "
+			+ " error_message = :errorMessage, "
 			+ " version = :nextVersion "
 			+ " where id = :id "
 			+ " and version = :currentVersion";
@@ -125,6 +129,8 @@ public class PostgresWorkRepository implements WorkRepository {
 			.addValue("started", work.getStartedTime())
 			.addValue("completed", work.getCompletedTime())
 			.addValue("state", work.getState().name())
+			.addValue("executionCount", work.getExecutionCount())
+			.addValue("errorMessage", work.getErrorMessage())
 			.addValue("nextVersion", nextVersion)
 			.addValue("currentVersion", work.getVersion());
 		
