@@ -44,14 +44,6 @@ curl http://localhost:8080/api/jobs
 ```
 
 
-TODO
-==============
-* Error handling
-* More tests (oh my)
-* Documentation etc etc 
-* Making work in progress visible to outside transactions
-
-
 Disclaimer
 ==============
 Probably it doesn't work on your computer, but if it is any help it does work on mine! Have a great day!
